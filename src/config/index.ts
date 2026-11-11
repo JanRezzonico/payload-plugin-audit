@@ -43,10 +43,9 @@ type IncomingAuditPluginPayloadConfig = {
 }
 
 type AuditPluginPayloadConfig = {
-  createdByName: string
   customizeFields: ConfigCustomizeFields
   disabled: false
-  updateDeltaName: string
+  logsCollectionSlug: 'audit-plugin-logs'
 } & IncomingAuditPluginPayloadConfig
 
 const isPluginEnabled = (config: IncomingAuditPluginPayloadConfig): boolean => {
@@ -71,10 +70,9 @@ const preparePluginConfig = (
 
   return {
     ...config,
-    createdByName: 'createdBy',
     customizeFields,
     disabled: false,
-    updateDeltaName: 'updateDelta',
+    logsCollectionSlug: 'audit-plugin-logs' as const,
   }
 }
 

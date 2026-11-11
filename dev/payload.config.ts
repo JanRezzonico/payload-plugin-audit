@@ -36,7 +36,7 @@ export default buildConfig({
       canAccessAudits: ({ req: { user } }) => {
         return !!user && user.role === 'admin'
       },
-      enabledCollections: ['media'],
+      enabledCollections: ['media', 'posts'],
       userCollection: 'users',
     }),
   ],
