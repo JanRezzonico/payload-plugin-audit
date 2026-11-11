@@ -29,7 +29,7 @@ const generateUpdateDeltaHook = (config: AuditPluginPayloadConfig): CollectionAf
     const delta = jsondiffpatch.diff(original, nextData)
 
     await req.payload.create({
-      collection: config.logsCollectionSlug,
+      collection: config.slugs.logsCollection,
       context,
       data: {
         delta,

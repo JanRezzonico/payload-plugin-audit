@@ -3,7 +3,7 @@ import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionConfig => {
   return {
-    slug: config.logsCollectionSlug,
+    slug: config.slugs.logsCollection,
     access: {
       create: config.canManageAudits,
       delete: config.canManageAudits,

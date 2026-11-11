@@ -15,7 +15,7 @@ const generateCreatedByHook = (config: AuditPluginPayloadConfig): CollectionAfte
       return
     }
     await req.payload.create({
-      collection: config.logsCollectionSlug,
+      collection: config.slugs.logsCollection,
       context,
       data: {
         delta: null, // No delta for create operations

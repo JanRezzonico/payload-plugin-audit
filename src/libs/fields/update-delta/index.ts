@@ -1,7 +1,7 @@
 import type { Field } from 'payload'
 import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
-const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => {
+const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Field => {
   const ui = config.customizeFields.updateDelta
   return {
     name: config.slugs.updateDeltaVirtualField,
@@ -97,4 +97,4 @@ const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => {
   }
 }
 
-export { generateUpdateDeltaField }
+export { generateUpdateDeltaVirtualField }

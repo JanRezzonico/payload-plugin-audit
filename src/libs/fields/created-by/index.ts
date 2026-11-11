@@ -1,7 +1,7 @@
 import type { Field } from 'payload'
 import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
-const generateCreatedByField = (config: AuditPluginPayloadConfig): Field => ({
+const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field => ({
   name: config.slugs.createdByVirtualField,
   type: 'relationship',
   access: {
@@ -46,4 +46,4 @@ const generateCreatedByField = (config: AuditPluginPayloadConfig): Field => ({
   virtual: true,
 })
 
-export { generateCreatedByField }
+export { generateCreatedByVirtualField }
