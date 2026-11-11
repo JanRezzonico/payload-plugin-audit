@@ -16,7 +16,7 @@ export const Users: CollectionConfig = {
         update: ({ req: { user } }) => user?.role === 'admin',
       },
       defaultValue: 'normal',
-      options: ['admin', 'normal'],
+      options: ['admin', 'viewer', 'normal'],
       required: true,
     },
   ],

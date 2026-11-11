@@ -11,8 +11,7 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
       update: config.canManageAudits,
     },
     admin: {
-      hidden: false, // TODO: ask reverse of canAccessAudits, as it is not
-      // strictly a boolean so it cannot just be negated
+      // hidden:
 
       defaultColumns: ['operation', 'entity', 'userId', 'createdAt'],
     },

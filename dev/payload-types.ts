@@ -70,6 +70,7 @@ export interface Config {
     posts: Post;
     media: Media;
     users: User;
+    'audit-plugin-logs': AuditPluginLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'audit-plugin-logs': AuditPluginLogsSelect<false> | AuditPluginLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -143,6 +145,15 @@ export interface Post {
   } | null;
   author: number | User;
   media?: (number | Media)[] | null;
+  someJson?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -152,7 +163,7 @@ export interface Post {
  */
 export interface User {
   id: number;
-  role: 'admin' | 'normal';
+  role: 'admin' | 'viewer' | 'normal';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -180,23 +191,6 @@ export interface User {
 export interface Media {
   id: number;
   alt?: string | null;
-  createdBy?: (number | null) | User;
-  updateDelta?:
-    | {
-        user?: (number | null) | User;
-        date?: string | null;
-        delta?:
-          | {
-              [k: string]: unknown;
-            }
-          | unknown[]
-          | string
-          | number
-          | boolean
-          | null;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -208,6 +202,35 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-plugin-logs".
+ */
+export interface AuditPluginLog {
+  id: number;
+  operation: 'create' | 'update';
+  entity:
+    | {
+        relationTo: 'media';
+        value: number | Media;
+      }
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      };
+  userId: number | User;
+  delta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -244,6 +267,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'audit-plugin-logs';
+        value: number | AuditPluginLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -296,6 +323,7 @@ export interface PostsSelect<T extends boolean = true> {
   content?: T;
   author?: T;
   media?: T;
+  someJson?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -305,15 +333,6 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  createdBy?: T;
-  updateDelta?:
-    | T
-    | {
-        user?: T;
-        date?: T;
-        delta?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -349,6 +368,18 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-plugin-logs_select".
+ */
+export interface AuditPluginLogsSelect<T extends boolean = true> {
+  operation?: T;
+  entity?: T;
+  userId?: T;
+  delta?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

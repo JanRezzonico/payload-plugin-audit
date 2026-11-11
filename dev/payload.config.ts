@@ -34,9 +34,8 @@ export default buildConfig({
   },
   plugins: [
     auditPluginPayload({
-      canAccessAudits: ({ req: { user } }) => {
-        return !!user && user.role === 'admin'
-      },
+      canManageAudits: ({ req }) => req.user?.role === 'admin',
+      canSeeAudits: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
       enabledCollections: ['media', 'posts'],
       userCollection: 'users',
     }),

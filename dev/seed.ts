@@ -5,7 +5,7 @@ export const seed = async (payload: Payload) => {
     collection: 'users',
     where: {
       email: {
-        equals: devUser.email,
+        equals: adminUser.email,
       },
     },
   })
@@ -13,7 +13,11 @@ export const seed = async (payload: Payload) => {
   if (!totalDocs) {
     await payload.create({
       collection: 'users',
-      data: devUser,
+      data: adminUser,
+    })
+    await payload.create({
+      collection: 'users',
+      data: viewerUser,
     })
     await payload.create({
       collection: 'users',
@@ -22,10 +26,16 @@ export const seed = async (payload: Payload) => {
   }
 }
 
-const devUser = {
+const adminUser = {
   email: 'admin-dev@example.local',
   password: 'test',
   role: 'admin' as const,
+}
+
+const viewerUser = {
+  email: 'viewer-dev@example.local',
+  password: 'test',
+  role: 'viewer' as const,
 }
 
 const normalUser = {
