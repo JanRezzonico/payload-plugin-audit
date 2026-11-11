@@ -4,7 +4,7 @@ import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => {
   const ui = config.customizeFields.updateDelta
   return {
-    name: `${config.pluginPrefix}-update-delta`,
+    name: config.slugs.updateDeltaVirtualField,
     type: 'array',
     access: {
       create: () => false, // No create of virtual field allowed
@@ -18,7 +18,7 @@ const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => {
         RowLabel: 'audit-plugin-payload/client#UpdateDeltaRowLabel',
       },
       condition: (data) => {
-        const rows = data?.[config.pluginPrefix + '-update-delta']
+        const rows = data?.[config.slugs.updateDeltaVirtualField]
         return Array.isArray(rows) && rows.length > 0
       },
       initCollapsed: true,
@@ -65,7 +65,7 @@ const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => {
             return undefined
           }
           const { docs } = await req.payload.find({
-            collection: config.logsCollectionSlug,
+            collection: config.slugs.logsCollection,
             depth: 0,
             pagination: false,
             req,

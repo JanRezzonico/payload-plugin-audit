@@ -21,17 +21,22 @@ const preparePluginConfig = (
     throw new Error('Invalid audit plugin configuration')
   }
   const customizeFields = mergeCustomizeFields(config.customizeFields)
-  const pluginPrefix = 'audit-plugin'
   const logsCollectionHidden =
     config.logsCollectionHidden === undefined ? false : config.logsCollectionHidden
+
+  const pluginPrefix = 'audit-plugin'
 
   return {
     ...config,
     customizeFields,
     disabled: false,
     logsCollectionHidden,
-    logsCollectionSlug: `${pluginPrefix}-logs` as const,
-    pluginPrefix,
+    slugs: {
+      createdByVirtualField: `${pluginPrefix}-created-by` as const,
+      logsCollection: `${pluginPrefix}-logs` as const,
+      pluginPrefix,
+      updateDeltaVirtualField: `${pluginPrefix}-update-delta` as const,
+    },
   }
 }
 

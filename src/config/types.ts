@@ -11,6 +11,13 @@ import type {
   OptionalConfigCustomizeFields,
 } from './customize-fields/types.js'
 
+type Slugs = {
+  createdByVirtualField: `${Slugs['pluginPrefix']}-created-by`
+  logsCollection: `${Slugs['pluginPrefix']}-logs`
+  pluginPrefix: 'audit-plugin'
+  updateDeltaVirtualField: `${Slugs['pluginPrefix']}-update-delta`
+}
+
 type IncomingAuditPluginPayloadConfig = {
   canManageAudits: ConfigCanManageAudits
 
@@ -31,8 +38,7 @@ type AuditPluginPayloadConfig = {
   customizeFields: ConfigCustomizeFields
   disabled: false
   logsCollectionHidden: ConfigLogsCollectionHidden
-  logsCollectionSlug: `audit-plugin-logs`
-  pluginPrefix: 'audit-plugin'
+  slugs: Slugs
 } & IncomingAuditPluginPayloadConfig
 
 export type { AuditPluginPayloadConfig, IncomingAuditPluginPayloadConfig }
