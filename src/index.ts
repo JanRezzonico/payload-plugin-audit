@@ -21,29 +21,17 @@ export const auditPluginPayload =
     const updateDeltaHook = generateUpdateDeltaHook(pluginConfig)
 
     config.collections?.forEach((collection) => {
-      const configForThisCollection = pluginConfig.collectionConfigs[collection.slug] ?? null
-      if (!configForThisCollection) {
-        // This connection is not configured for audits, so we skip it
-        return
-      }
-      const { createdByEnabled, updateDeltaEnabled } = configForThisCollection
-      if (!createdByEnabled && !updateDeltaEnabled) {
-        // This connection is configured for audits, but no fields are enabled, so we skip it
+      if (!pluginConfig.enabledCollections.includes(collection.slug)) {
         return
       }
 
       collection.fields = collection.fields ?? []
       collection.hooks = collection.hooks ?? {}
       collection.hooks.beforeChange = collection.hooks.beforeChange ?? []
-
-      if (createdByEnabled) {
-        collection.fields.push(createdByField)
-        collection.hooks.beforeChange.push(createdByHook)
-      }
-      if (updateDeltaEnabled) {
-        collection.fields.push(updateDeltaField)
-        collection.hooks.beforeChange.push(updateDeltaHook)
-      }
+      collection.fields.push(createdByField)
+      collection.hooks.beforeChange.push(createdByHook)
+      collection.fields.push(updateDeltaField)
+      collection.hooks.beforeChange.push(updateDeltaHook)
     })
 
     // if (!config.collections) {

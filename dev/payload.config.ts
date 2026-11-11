@@ -36,12 +36,7 @@ export default buildConfig({
       canAccessAudits: ({ req: { user } }) => {
         return !!user && user.role === 'admin'
       },
-      collectionConfigs: {
-        media: {
-          createdByEnabled: true,
-          updateDeltaEnabled: true,
-        },
-      },
+      enabledCollections: ['media'],
       userCollection: 'users',
     }),
   ],

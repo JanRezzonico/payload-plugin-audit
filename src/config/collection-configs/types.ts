@@ -1,11 +1,5 @@
 import type { CollectionSlug } from 'payload'
 
-type CollectionConfig = {
-  createdByEnabled: boolean
-  updateDeltaEnabled: boolean
-  // TODO: omitFields and other useful configs
-}
+type EnabledCollections = Array<CollectionSlug>
 
-type CollectionConfigs = Partial<Record<CollectionSlug, CollectionConfig>>
-
-export type { CollectionConfig, CollectionConfigs }
+export type { EnabledCollections }
