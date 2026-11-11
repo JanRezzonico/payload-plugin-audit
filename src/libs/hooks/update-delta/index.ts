@@ -17,11 +17,15 @@ const generateUpdateDeltaHook = (config: AuditPluginPayloadConfig): CollectionAf
       return
     }
 
-    // Exclude the id from the delta, as it is not relevant for auditing purposes
+    // Exclude the id and timestamps from the delta, as they are not relevant to the update delta
     const original = structuredClone(previousDoc) as Record<string, unknown>
     const nextData = structuredClone(doc) as Record<string, unknown>
     delete original.id
     delete nextData.id
+    delete original.createdAt
+    delete nextData.createdAt
+    delete original.updatedAt
+    delete nextData.updatedAt
     const delta = jsondiffpatch.diff(original, nextData)
 
     await req.payload.create({

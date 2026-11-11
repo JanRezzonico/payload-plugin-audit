@@ -13,6 +13,7 @@ const generateCreatedByField = (config: AuditPluginPayloadConfig): Field => ({
     allowCreate: false,
     allowEdit: false,
     appearance: 'drawer',
+    condition: (data) => Boolean(data?.id), // Hide on create ops
     readOnly: true,
   },
   hooks: {

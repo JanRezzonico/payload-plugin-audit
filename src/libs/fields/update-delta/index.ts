@@ -10,6 +10,12 @@ const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => ({
     update: () => false,
   },
   admin: {
+    // Hide on create ops and when there are no update deltas for the entity
+    // (when the entity has never been updated)
+    condition: (data) => {
+      const rows = data?.[config.pluginPrefix + '-update-delta']
+      return Array.isArray(rows) && rows.length > 0
+    },
     initCollapsed: true,
     readOnly: true,
   },
@@ -58,7 +64,7 @@ const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => ({
           depth: 0,
           pagination: false,
           req,
-          sort: 'createdAt', // use '-createdAt' for newest first
+          sort: '-createdAt',
           where: {
             and: [
               { operation: { equals: 'update' } },
@@ -68,7 +74,7 @@ const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => ({
           },
         })
         return docs.map((audit) => ({
-          id: audit.id, // array rows need an id for the admin UI
+          id: audit.id,
           date: audit.createdAt,
           delta: audit.delta,
           user: audit.userId,
