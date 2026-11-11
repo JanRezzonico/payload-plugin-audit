@@ -9,7 +9,13 @@ import * as jsonpatchFormatter from 'jsondiffpatch/formatters/jsonpatch'
 import { useMemo } from 'react'
 
 import './DeltaViewer.css'
-import { type ChipVariant, classifyOp, formatPath, formatValue, getOldValue } from './utils.js'
+import {
+  type ChipVariant,
+  classifyOp,
+  formatPath,
+  formatValue,
+  getOldValue,
+} from './DeltaViewer.utils.js'
 
 type OpKind = 'added' | 'moved' | 'removed' | 'updated'
 

@@ -12,6 +12,9 @@ const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => ({
   admin: {
     // Hide on create ops and when there are no update deltas for the entity
     // (when the entity has never been updated)
+    components: {
+      RowLabel: 'audit-plugin-payload/client#UpdateDeltaRowLabel',
+    },
     condition: (data) => {
       const rows = data?.[config.pluginPrefix + '-update-delta']
       return Array.isArray(rows) && rows.length > 0

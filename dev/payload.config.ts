@@ -17,7 +17,8 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     importMap: {
-      baseDir: path.resolve(dirname),
+      baseDir: dirname,
+      importMapFile: path.resolve(dirname, 'app/(payload)/admin/importMap.js'),
     },
   },
   collections: [Posts, Media, Users],
