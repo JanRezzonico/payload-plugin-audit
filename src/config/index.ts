@@ -45,7 +45,8 @@ type IncomingAuditPluginPayloadConfig = {
 type AuditPluginPayloadConfig = {
   customizeFields: ConfigCustomizeFields
   disabled: false
-  logsCollectionSlug: 'audit-plugin-logs'
+  logsCollectionSlug: `audit-plugin-logs`
+  pluginPrefix: 'audit-plugin'
 } & IncomingAuditPluginPayloadConfig
 
 const isPluginEnabled = (config: IncomingAuditPluginPayloadConfig): boolean => {
@@ -67,12 +68,14 @@ const preparePluginConfig = (
     throw new Error('Invalid audit plugin configuration')
   }
   const customizeFields = mergeCustomizeFields(config.customizeFields)
+  const pluginPrefix = 'audit-plugin'
 
   return {
     ...config,
     customizeFields,
     disabled: false,
-    logsCollectionSlug: 'audit-plugin-logs' as const,
+    logsCollectionSlug: `${pluginPrefix}-logs` as const,
+    pluginPrefix,
   }
 }
 
