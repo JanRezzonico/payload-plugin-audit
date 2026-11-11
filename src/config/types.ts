@@ -19,18 +19,46 @@ type Slugs = {
 }
 
 type IncomingAuditPluginPayloadConfig = {
+  /**
+   * Payload access control function.
+   * Controls access to manage audit logs and the corresponding audit fields.
+   */
   canManageAudits: ConfigCanManageAudits
 
+  /**
+   * Payload access control function.
+   * Controls access to view audit logs and the corresponding audit fields.
+   */
   canSeeAudits: ConfigCanSeeAudits
 
+  /**
+   * Customizes labels and date formatting for fields added by the plugin.
+   */
   customizeFields?: OptionalConfigCustomizeFields
 
+  /**
+   * Disables the plugin when set to true.
+   *
+   * @default false
+   */
   disabled?: boolean
 
+  /**
+   * Collections that should receive audit logging.
+   */
   enabledCollections: EnabledCollections
 
+  /**
+   * Hides the audit logs collection from the Payload admin panel when true.
+   *
+   * @default false
+   * Anyone allowed by `canSeeAudits` can also see the collection in the admin panel.
+   */
   logsCollectionHidden?: ConfigLogsCollectionHidden
 
+  /**
+   * The collection slug used for users associated with audit records.
+   */
   userCollection: CollectionSlug
 }
 
