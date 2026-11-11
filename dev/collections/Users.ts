@@ -10,6 +10,11 @@ export const Users: CollectionConfig = {
     {
       name: 'role',
       type: 'select',
+      access: {
+        create: ({ req: { user } }) => user?.role === 'admin',
+        read: ({ req: { user } }) => !!user,
+        update: ({ req: { user } }) => user?.role === 'admin',
+      },
       defaultValue: 'normal',
       options: ['admin', 'normal'],
       required: true,
