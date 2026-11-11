@@ -1,6 +1,6 @@
 import type { Config } from 'payload'
 
-import type { IncomingAuditPluginPayloadConfig } from './config/index.js'
+import type { IncomingAuditPluginPayloadConfig } from './config/types.js'
 
 import { isPluginEnabled, preparePluginConfig } from './config/index.js'
 import { generateLogsCollection } from './libs/collections/logs/index.js'

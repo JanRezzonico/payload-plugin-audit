@@ -1,5 +1,5 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/index.js'
+import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 import * as jsondiffpatch from 'jsondiffpatch'
 

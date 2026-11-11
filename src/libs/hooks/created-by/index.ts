@@ -1,5 +1,5 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/index.js'
+import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 const generateCreatedByHook = (config: AuditPluginPayloadConfig): CollectionAfterChangeHook => {
   return async ({ collection, context, doc, operation, req }) => {

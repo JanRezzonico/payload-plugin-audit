@@ -1,16 +1,14 @@
 import type { CollectionConfig } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/index.js'
+import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionConfig => {
   return {
     slug: config.logsCollectionSlug,
     access: {
-      // TODO: consider if create, delete and update should just be false,
-      // to avoid admins (or whoever) from rewriting history or crafting fake logs
-      create: () => false,
-      delete: config.canAccessAudits,
-      read: config.canAccessAudits,
-      update: () => false,
+      create: config.canManageAudits,
+      delete: config.canManageAudits,
+      read: config.canSeeAudits,
+      update: config.canManageAudits,
     },
     admin: {
       hidden: false, // TODO: ask reverse of canAccessAudits, as it is not

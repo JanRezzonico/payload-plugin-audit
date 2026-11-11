@@ -1,13 +1,13 @@
 import type { Field } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/index.js'
+import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 const generateCreatedByField = (config: AuditPluginPayloadConfig): Field => ({
   name: `${config.pluginPrefix}-created-by`,
   type: 'relationship',
   access: {
-    create: () => false,
-    read: config.canAccessAudits,
-    update: () => false,
+    create: () => false, // No create of virtual field allowed
+    read: config.canSeeAudits,
+    update: () => false, // No update of virtual field allowed
   },
   admin: {
     allowCreate: false,

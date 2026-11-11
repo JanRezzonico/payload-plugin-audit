@@ -1,13 +1,13 @@
 import type { Field } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/index.js'
+import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 const generateUpdateDeltaField = (config: AuditPluginPayloadConfig): Field => ({
   name: `${config.pluginPrefix}-update-delta`,
   type: 'array',
   access: {
-    create: () => false,
-    read: config.canAccessAudits,
-    update: () => false,
+    create: () => false, // No create of virtual field allowed
+    read: config.canSeeAudits,
+    update: () => false, // No update of virtual field allowed
   },
   admin: {
     // Hide on create ops and when there are no update deltas for the entity
