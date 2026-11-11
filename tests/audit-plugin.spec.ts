@@ -114,6 +114,27 @@ describe('auditPluginPayload config transform', () => {
     ])
   })
 
+  test('preserves existing collection hooks and only transforms enabled collections', () => {
+    const existingHook = vi.fn()
+    const posts: CollectionConfig = {
+      slug: 'posts',
+      fields: [],
+      hooks: { afterChange: [existingHook] },
+    }
+    const media: CollectionConfig = {
+      slug: 'media',
+      fields: [],
+      hooks: { afterChange: [existingHook] },
+    }
+
+    const config = applyPlugin([posts, media])
+
+    expect(findCollection(config, 'posts')?.hooks?.afterChange).toHaveLength(3)
+    expect(findCollection(config, 'posts')?.hooks?.afterChange?.[0]).toBe(existingHook)
+    expect(findCollection(config, 'media')?.hooks?.afterChange).toEqual([existingHook])
+    expect(findCollection(config, 'media')?.fields).toEqual([])
+  })
+
   test('configures log access and relationships', () => {
     const config = applyPlugin([{ slug: 'posts', fields: [] }], {
       enabledCollections: ['posts', 'media'],
@@ -145,6 +166,15 @@ describe('auditPluginPayload config transform', () => {
 
     expect(() => auditPluginPayload(options as any)(config)).not.toThrow()
     expect(options).toEqual(basePluginConfig)
+  })
+
+  test('rejects invalid configurations when preparing plugin values', () => {
+    expect(() => preparePluginConfig({ ...basePluginConfig, disabled: true })).toThrow(
+      'Invalid audit plugin configuration',
+    )
+    expect(() => preparePluginConfig({ ...basePluginConfig, enabledCollections: [] })).toThrow(
+      'Invalid audit plugin configuration',
+    )
   })
 })
 
@@ -223,6 +253,160 @@ describe('audit log hooks', () => {
         operation: 'update',
         userId: 'user-2',
       },
+    })
+  })
+
+  test('excludes ids and timestamps from update deltas and returns the document', async () => {
+    const config = applyPlugin([{ slug: 'posts', fields: [] }])
+    const doc = {
+      id: 'post-1',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      title: 'After',
+      updatedAt: '2026-01-02T00:00:00.000Z',
+    }
+    const createAuditLog = vi.fn()
+    const collection = findCollection(config, 'posts')
+    const updateHook = collection?.hooks?.afterChange?.[1]
+
+    const result = await updateHook?.({
+      collection,
+      context: { source: 'test' },
+      doc,
+      operation: 'update',
+      previousDoc: {
+        id: 'post-1',
+        createdAt: '2025-01-01T00:00:00.000Z',
+        title: 'Before',
+        updatedAt: '2025-01-02T00:00:00.000Z',
+      },
+      req: {
+        payload: { create: createAuditLog },
+        user: { id: 'user-2' },
+      },
+    } as unknown as HookArgs)
+
+    expect(result).toBe(doc)
+    expect(createAuditLog.mock.calls[0]?.[0]).toMatchObject({
+      context: { source: 'test' },
+      data: { delta: { title: ['Before', 'After'] } },
+      req: expect.any(Object),
+    })
+    expect(createAuditLog.mock.calls[0]?.[0].data.delta).not.toHaveProperty('id')
+    expect(createAuditLog.mock.calls[0]?.[0].data.delta).not.toHaveProperty('createdAt')
+    expect(createAuditLog.mock.calls[0]?.[0].data.delta).not.toHaveProperty('updatedAt')
+  })
+
+  test('does not write update logs without a user', async () => {
+    const config = applyPlugin([{ slug: 'posts', fields: [] }])
+    const createAuditLog = await runAfterChange(config, {
+      doc: { id: 'post-1', title: 'After' },
+      operation: 'update',
+      previousDoc: { id: 'post-1', title: 'Before' },
+      user: null,
+    })
+
+    expect(createAuditLog).not.toHaveBeenCalled()
+  })
+
+  test('does not write create or update logs for unrelated operations', async () => {
+    const config = applyPlugin([{ slug: 'posts', fields: [] }])
+    const createAuditLog = vi.fn()
+    const collection = findCollection(config, 'posts')
+
+    for (const hook of collection?.hooks?.afterChange ?? []) {
+      await hook({
+        collection,
+        context: {},
+        doc: { id: 'post-1' },
+        operation: 'delete',
+        req: { payload: { create: createAuditLog }, user: { id: 'user-1' } },
+      } as unknown as HookArgs)
+    }
+
+    expect(createAuditLog).not.toHaveBeenCalled()
+  })
+
+  describe('audit virtual fields', () => {
+    test('hydrates the created-by field from the earliest create log', async () => {
+      const config = applyPlugin([{ slug: 'posts', fields: [] }])
+      const field = findCollection(config, 'posts')?.fields[0] as any
+      const find = vi.fn().mockResolvedValue({ docs: [{ userId: 'user-1' }] })
+
+      const result = await field?.hooks?.afterRead?.[0]?.({
+        collection: { slug: 'posts' },
+        data: { id: 'post-1' },
+        req: { payload: { find } },
+      } as any)
+
+      expect(result).toBe('user-1')
+      expect(find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          collection: 'audit-plugin-logs',
+          depth: 0,
+          limit: 1,
+          sort: 'createdAt',
+          where: {
+            and: [
+              { operation: { equals: 'create' } },
+              { 'entity.relationTo': { equals: 'posts' } },
+              { 'entity.value': { equals: 'post-1' } },
+            ],
+          },
+        }),
+      )
+    })
+
+    test('hydrates update history in newest-first order', async () => {
+      const config = applyPlugin([{ slug: 'posts', fields: [] }])
+      const field = findCollection(config, 'posts')?.fields[1] as any
+      const find = vi.fn().mockResolvedValue({
+        docs: [
+          { id: 'log-2', createdAt: '2026-01-02', delta: { title: ['B', 'C'] }, userId: 'user-2' },
+          { id: 'log-1', createdAt: '2026-01-01', delta: { title: ['A', 'B'] }, userId: 'user-1' },
+        ],
+      })
+
+      const result = await field?.hooks?.afterRead?.[0]?.({
+        collection: { slug: 'posts' },
+        data: { id: 'post-1' },
+        req: { payload: { find } },
+      } as any)
+
+      expect(result).toEqual([
+        { id: 'log-2', date: '2026-01-02', delta: { title: ['B', 'C'] }, user: 'user-2' },
+        { id: 'log-1', date: '2026-01-01', delta: { title: ['A', 'B'] }, user: 'user-1' },
+      ])
+      expect(find).toHaveBeenCalledWith(
+        expect.objectContaining({ pagination: false, sort: '-createdAt' }),
+      )
+    })
+
+    test('hides virtual fields when they have no applicable data', () => {
+      const config = applyPlugin([{ slug: 'posts', fields: [] }])
+      const fields = findCollection(config, 'posts')?.fields
+      const createdBy = fields?.[0] as any
+      const updateDelta = fields?.[1] as any
+
+      expect(createdBy?.admin?.condition?.({} as any, {} as any, {} as any)).toBe(false)
+      expect(updateDelta?.admin?.condition?.({} as any, {} as any, {} as any)).toBe(false)
+      expect(
+        updateDelta?.admin?.condition?.(
+          { 'audit-plugin-update-delta': [] } as any,
+          {} as any,
+          {} as any,
+        ),
+      ).toBe(false)
+      expect(
+        updateDelta?.admin?.condition?.(
+          { 'audit-plugin-update-delta': [{}] } as any,
+          {} as any,
+          {} as any,
+        ),
+      ).toBe(true)
+      expect(createdBy?.access?.create?.({} as any)).toBe(false)
+      expect(createdBy?.access?.update?.({} as any)).toBe(false)
+      expect(updateDelta?.access?.create?.({} as any)).toBe(false)
+      expect(updateDelta?.access?.update?.({} as any)).toBe(false)
     })
   })
 
