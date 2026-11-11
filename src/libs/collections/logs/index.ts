@@ -11,7 +11,7 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
       update: config.canManageAudits,
     },
     admin: {
-      // hidden:
+      hidden: config.logsCollectionHidden,
 
       defaultColumns: ['operation', 'entity', 'userId', 'createdAt'],
     },

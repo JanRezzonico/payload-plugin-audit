@@ -22,11 +22,14 @@ const preparePluginConfig = (
   }
   const customizeFields = mergeCustomizeFields(config.customizeFields)
   const pluginPrefix = 'audit-plugin'
+  const logsCollectionHidden =
+    config.logsCollectionHidden === undefined ? false : config.logsCollectionHidden
 
   return {
     ...config,
     customizeFields,
     disabled: false,
+    logsCollectionHidden,
     logsCollectionSlug: `${pluginPrefix}-logs` as const,
     pluginPrefix,
   }
