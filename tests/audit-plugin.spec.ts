@@ -6,8 +6,11 @@ import { describe, expect, test, vi } from 'vitest'
 import { isPluginEnabled, preparePluginConfig } from '../src/config/index.js'
 import { auditPluginPayload } from '../src/index.js'
 
-const canAccessAudits = ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
+const canManageAudits = ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
   user?.role === 'admin'
+
+const canSeeAudits = ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
+  user?.role === 'admin' || user?.role === 'editor'
 
 const createConfig = (collections: NonNullable<Config['collections']>): Config => ({
   collections,
@@ -24,7 +27,8 @@ const deepFreeze = <T>(value: T): T => {
 }
 
 const basePluginConfig = {
-  canAccessAudits,
+  canManageAudits,
+  canSeeAudits,
   enabledCollections: ['posts'],
   userCollection: 'users',
 }
@@ -99,7 +103,7 @@ describe('auditPluginPayload config transform', () => {
     expect(config.collections).toHaveLength(3)
     expect(
       findCollection(config, 'posts')?.fields.map((field) => 'name' in field && field.name),
-    ).toEqual(['title'])
+    ).toEqual(['title', 'audit-plugin-created-by', 'audit-plugin-update-delta'])
     expect(findCollection(config, 'media')).toMatchObject({ fields: [] })
     expect(logs).toMatchObject({ slug: 'audit-plugin-logs', timestamps: true })
     expect(logs?.fields.map((field) => 'name' in field && field.name)).toEqual([
@@ -118,12 +122,21 @@ describe('auditPluginPayload config transform', () => {
     const entity = logs?.fields.find((field) => 'name' in field && field.name === 'entity')
     const userId = logs?.fields.find((field) => 'name' in field && field.name === 'userId')
 
-    expect(logs?.access?.create?.({} as any)).toBe(false)
-    expect(logs?.access?.update?.({} as any)).toBe(false)
+    expect(logs?.access?.create?.({ req: { user: { role: 'admin' } } } as any)).toBe(true)
+    expect(logs?.access?.update?.({ req: { user: { role: 'editor' } } } as any)).toBe(false)
     expect(logs?.access?.read?.({ req: { user: { role: 'admin' } } } as any)).toBe(true)
-    expect(logs?.access?.read?.({ req: { user: { role: 'editor' } } } as any)).toBe(false)
+    expect(logs?.access?.read?.({ req: { user: { role: 'editor' } } } as any)).toBe(true)
+    expect(logs?.access?.delete?.({ req: { user: { role: 'editor' } } } as any)).toBe(false)
     expect(entity).toMatchObject({ relationTo: ['posts', 'media'] })
     expect(userId).toMatchObject({ relationTo: 'users' })
+  })
+
+  test('configures log collection visibility', () => {
+    const config = applyPlugin([{ slug: 'posts', fields: [] }], {
+      logsCollectionHidden: true,
+    })
+
+    expect(getLogCollection(config)?.admin?.hidden).toBe(true)
   })
 
   test('does not mutate the options it is given', () => {
@@ -157,8 +170,13 @@ describe('plugin option helpers', () => {
       },
       disabled: false,
       enabledCollections: ['posts'],
-      logsCollectionSlug: 'audit-plugin-logs',
-      pluginPrefix: 'audit-plugin',
+      logsCollectionHidden: false,
+      slugs: {
+        createdByVirtualField: 'audit-plugin-created-by',
+        logsCollection: 'audit-plugin-logs',
+        pluginPrefix: 'audit-plugin',
+        updateDeltaVirtualField: 'audit-plugin-update-delta',
+      },
     })
   })
 })
