@@ -10,7 +10,7 @@ export const Posts: CollectionConfig = {
     },
     {
       name: 'content',
-      type: 'text',
+      type: 'richText',
     },
     {
       name: 'author',
@@ -23,6 +23,10 @@ export const Posts: CollectionConfig = {
       type: 'relationship',
       hasMany: true,
       relationTo: 'media',
+    },
+    {
+      name: 'someJson',
+      type: 'json',
     },
   ],
 }
