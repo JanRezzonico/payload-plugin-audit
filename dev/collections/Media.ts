@@ -9,6 +9,6 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    staticDir: 'media',
+    staticDir: 'dev/media',
   },
 }
