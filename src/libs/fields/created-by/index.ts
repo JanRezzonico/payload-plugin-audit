@@ -41,7 +41,7 @@ const generateCreatedByField = (config: AuditPluginPayloadConfig): Field => ({
       },
     ],
   },
-  label: 'Created By',
+  label: config.customizeFields.createdBy.label,
   relationTo: config.userCollection,
   virtual: true,
 })
