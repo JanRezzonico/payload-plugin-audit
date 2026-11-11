@@ -10,3 +10,7 @@
   - For example, recognize by the collection fields that that collection holds media, then give a single media diff preview instead of a diff for each property that changes
 - Multiple `userCollection` support
   - Right now, the plugin assumes that there is only one user collection, but it would be nice to support multiple user collections (for example, if you have a separate collection for admins and regular users)
+
+
+
+Update readme with actual npm package name and instructions
