@@ -3,22 +3,7 @@ import type { Op } from 'jsondiffpatch/formatters/jsonpatch'
 
 export type ChipVariant = 'neutral' | 'new' | 'old' | 'update'
 
-export const OP_LABELS: Record<string, { text: string; variant: ChipVariant }> = {
-  add: { text: 'Added', variant: 'new' },
-  move: { text: 'Moved', variant: 'update' },
-  remove: { text: 'Removed', variant: 'old' },
-  replace: { text: 'Updated', variant: 'update' },
-}
-
-export const FALLBACK_LABEL: { text: string; variant: ChipVariant } = {
-  text: 'Changed',
-  variant: 'neutral',
-}
-
-/**
- * Splits a JSON Pointer into unescaped segments.
- * */
-export function parsePointer(pointer: string): string[] {
+function parsePointer(pointer: string): string[] {
   return pointer
     .replace(/^\//, '')
     .split('/')
@@ -48,7 +33,7 @@ export function getOldValue(delta: Delta, pointer: string): unknown {
   return Array.isArray(node) && node.length === 2 ? node[0] : undefined
 }
 
-export function isEmptyValue(value: unknown): boolean {
+function isEmptyValue(value: unknown): boolean {
   if (value === null || value === undefined) {
     return true
   }
