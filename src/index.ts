@@ -4,8 +4,6 @@ import type { IncomingAuditPluginPayloadConfig } from './config/index.js'
 
 import { isPluginEnabled, preparePluginConfig } from './config/index.js'
 import { generateLogsCollection } from './libs/collections/logs/index.js'
-import { generateCreatedByField } from './libs/fields/created-by/index.js'
-import { generateUpdateDeltaField } from './libs/fields/update-delta/index.js'
 import { generateCreatedByHook } from './libs/hooks/created-by/index.js'
 import { generateUpdateDeltaHook } from './libs/hooks/update-delta/index.js'
 
@@ -22,9 +20,6 @@ export const auditPluginPayload =
 
     const logsCollection = generateLogsCollection(pluginConfig)
 
-    const createdByField = generateCreatedByField(pluginConfig)
-    const updateDeltaField = generateUpdateDeltaField(pluginConfig)
-
     config.collections = config.collections ?? []
     config.collections.push(logsCollection)
 
@@ -37,13 +32,11 @@ export const auditPluginPayload =
       }
 
       collection.hooks = collection.hooks ?? {}
-      collection.hooks.afterChange = collection.hooks.beforeChange ?? []
-      collection.hooks.afterChange.push(createdByHook)
-      collection.hooks.afterChange.push(updateDeltaHook)
-
-      collection.fields = collection.fields ?? []
-      collection.fields.push(createdByField)
-      collection.fields.push(updateDeltaField)
+      collection.hooks.afterChange = [
+        ...(collection.hooks.afterChange ?? []),
+        createdByHook,
+        updateDeltaHook,
+      ]
     })
 
     return config

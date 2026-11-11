@@ -1,10 +1,11 @@
 // @ts-check
 
 import payloadEsLintConfig from '@payloadcms/eslint-config'
+import { globalIgnores } from 'eslint/config'
 
 export const defaultESLintIgnores = [
   '**/.temp',
-  '**/.*', // ignore all dotfiles
+  '**/.*',
   '**/.git',
   '**/.hg',
   '**/.pnp.*',
@@ -20,9 +21,11 @@ export const defaultESLintIgnores = [
   '**/build/',
   '**/node_modules/',
   '**/temp/',
+  '**/.next',
 ]
 
 export default [
+  globalIgnores(defaultESLintIgnores),
   ...payloadEsLintConfig,
   {
     rules: {
@@ -38,7 +41,6 @@ export default [
           maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 40,
           allowDefaultProject: ['scripts/*.ts', '*.js', '*.mjs', '*.spec.ts', '*.d.ts'],
         },
-        // projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
