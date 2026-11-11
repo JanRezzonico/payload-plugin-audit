@@ -26,7 +26,7 @@
     "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
     "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
     "build:types": "tsc --outDir dist --rootDir ./src",
-    "clean": "rimraf {dist,*.tsbuildinfo}",
+    "clean": "rm -rf {dist,*.tsbuildinfo}",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
     "dev": "next dev dev --turbo",
     "dev:generate-importmap": "pnpm dev:payload generate:importmap",
@@ -66,9 +66,7 @@
     "qs-esm": "8.0.1",
     "react": "19.2.9",
     "react-dom": "19.2.9",
-    "rimraf": "3.0.2",
     "sharp": "0.35.4",
-    "sort-package-json": "^2.10.0",
     "typescript": "5.7.3",
     "vite-tsconfig-paths": "6.0.5",
     "vitest": "4.0.18"
@@ -102,6 +100,6 @@
     "types": "./dist/index.d.ts"
   },
   "dependencies": {
-    "jsondiffpatch": "^0.7.7"
+    "jsondiffpatch": "0.7.7"
   }
 }
