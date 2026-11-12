@@ -4,6 +4,7 @@ import type { CollectionAfterChangeHook, CollectionConfig, Config } from 'payloa
 import { describe, expect, test, vi } from 'vitest'
 
 import { isPluginEnabled, preparePluginConfig } from '../src/config/index.js'
+import { normalizeUserCollections } from '../src/config/user-collections/index.js'
 import { auditPluginPayload } from '../src/index.js'
 
 const canManageAudits = ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
@@ -30,7 +31,7 @@ const basePluginConfig = {
   canManageAudits,
   canSeeAudits,
   enabledCollections: ['posts'],
-  userCollection: 'users',
+  userCollections: 'users',
 }
 
 type HookArgs = Parameters<CollectionAfterChangeHook>[0]
@@ -57,7 +58,7 @@ const runAfterChange = async (
     operation: 'create' | 'update'
     previousDoc?: Doc
     slug?: string
-    user?: { id: string } | null
+    user?: { collection: string; id: string } | null
   },
 ) => {
   const collection = findCollection(config, args.slug ?? 'posts')
@@ -72,7 +73,7 @@ const runAfterChange = async (
       previousDoc: args.previousDoc,
       req: {
         payload: { create: createAuditLog },
-        user: args.user === undefined ? { id: 'user-1' } : args.user,
+        user: args.user === undefined ? { id: 'user-1', collection: 'users' } : args.user,
       },
     } as unknown as HookArgs)
   }
@@ -149,7 +150,23 @@ describe('auditPluginPayload config transform', () => {
     expect(logs?.access?.read?.({ req: { user: { role: 'editor' } } } as any)).toBe(true)
     expect(logs?.access?.delete?.({ req: { user: { role: 'editor' } } } as any)).toBe(false)
     expect(entity).toMatchObject({ relationTo: ['posts', 'media'] })
-    expect(userId).toMatchObject({ relationTo: 'users' })
+    expect(userId).toMatchObject({ relationTo: ['users'] })
+  })
+
+  test('configures all audit relationships for multiple user collections', () => {
+    const config = applyPlugin([{ slug: 'posts', fields: [] }], {
+      userCollections: ['users', 'other-users'],
+    })
+    const logs = getLogCollection(config)
+    const fields = findCollection(config, 'posts')?.fields
+    const createdBy = fields?.[0]
+    const updateDelta = fields?.[1] as any
+    const userId = logs?.fields.find((field) => 'name' in field && field.name === 'userId')
+    const updateUser = updateDelta?.fields.find((field: any) => field.name === 'user')
+
+    expect(userId).toMatchObject({ relationTo: ['users', 'other-users'] })
+    expect(createdBy).toMatchObject({ relationTo: ['users', 'other-users'] })
+    expect(updateUser).toMatchObject({ relationTo: ['users', 'other-users'] })
   })
 
   test('configures log collection visibility', () => {
@@ -207,7 +224,13 @@ describe('plugin option helpers', () => {
         pluginPrefix: 'audit-plugin',
         updateDeltaVirtualField: 'audit-plugin-update-delta',
       },
+      userCollections: ['users'],
     })
+  })
+
+  test('normalizes scalar and array user collections', () => {
+    expect(normalizeUserCollections('users')).toEqual(['users'])
+    expect(normalizeUserCollections(['users', 'other-users'])).toEqual(['users', 'other-users'])
   })
 })
 
@@ -217,7 +240,7 @@ describe('audit log hooks', () => {
     const createAuditLog = await runAfterChange(config, {
       doc: { id: 'post-1', title: 'Post' },
       operation: 'create',
-      user: { id: 'user-1' },
+      user: { id: 'user-1', collection: 'users' },
     })
 
     expect(createAuditLog).toHaveBeenCalledOnce()
@@ -228,7 +251,7 @@ describe('audit log hooks', () => {
           delta: null,
           entity: { relationTo: 'posts', value: 'post-1' },
           operation: 'create',
-          userId: 'user-1',
+          userId: { relationTo: 'users', value: 'user-1' },
         },
         overrideAccess: true,
       }),
@@ -241,7 +264,7 @@ describe('audit log hooks', () => {
       doc: { id: 'post-1', title: 'After' },
       operation: 'update',
       previousDoc: { id: 'post-1', title: 'Before' },
-      user: { id: 'user-2' },
+      user: { id: 'user-2', collection: 'users' },
     })
 
     expect(createAuditLog).toHaveBeenCalledOnce()
@@ -251,7 +274,7 @@ describe('audit log hooks', () => {
         delta: { title: ['Before', 'After'] },
         entity: { relationTo: 'posts', value: 'post-1' },
         operation: 'update',
-        userId: 'user-2',
+        userId: { relationTo: 'users', value: 'user-2' },
       },
     })
   })
@@ -281,7 +304,7 @@ describe('audit log hooks', () => {
       },
       req: {
         payload: { create: createAuditLog },
-        user: { id: 'user-2' },
+        user: { id: 'user-2', collection: 'users' },
       },
     } as unknown as HookArgs)
 
@@ -294,6 +317,40 @@ describe('audit log hooks', () => {
     expect(createAuditLog.mock.calls[0]?.[0].data.delta).not.toHaveProperty('id')
     expect(createAuditLog.mock.calls[0]?.[0].data.delta).not.toHaveProperty('createdAt')
     expect(createAuditLog.mock.calls[0]?.[0].data.delta).not.toHaveProperty('updatedAt')
+  })
+
+  test('writes polymorphic audit users from a secondary user collection', async () => {
+    const config = applyPlugin([{ slug: 'posts', fields: [] }], {
+      userCollections: ['users', 'other-users'],
+    })
+    const createAuditLog = await runAfterChange(config, {
+      doc: { id: 'post-1', title: 'Post' },
+      operation: 'create',
+      user: { id: 'other-user-1', collection: 'other-users' },
+    })
+
+    expect(createAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          userId: { relationTo: 'other-users', value: 'other-user-1' },
+        }),
+      }),
+    )
+
+    const updateAuditLog = await runAfterChange(config, {
+      doc: { id: 'post-1', title: 'After' },
+      operation: 'update',
+      previousDoc: { id: 'post-1', title: 'Before' },
+      user: { id: 'other-user-1', collection: 'other-users' },
+    })
+
+    expect(updateAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          userId: { relationTo: 'other-users', value: 'other-user-1' },
+        }),
+      }),
+    )
   })
 
   test('does not write update logs without a user', async () => {
@@ -319,7 +376,10 @@ describe('audit log hooks', () => {
         context: {},
         doc: { id: 'post-1' },
         operation: 'delete',
-        req: { payload: { create: createAuditLog }, user: { id: 'user-1' } },
+        req: {
+          payload: { create: createAuditLog },
+          user: { id: 'user-1', collection: 'users' },
+        },
       } as unknown as HookArgs)
     }
 
@@ -330,7 +390,9 @@ describe('audit log hooks', () => {
     test('hydrates the created-by field from the earliest create log', async () => {
       const config = applyPlugin([{ slug: 'posts', fields: [] }])
       const field = findCollection(config, 'posts')?.fields[0] as any
-      const find = vi.fn().mockResolvedValue({ docs: [{ userId: 'user-1' }] })
+      const find = vi.fn().mockResolvedValue({
+        docs: [{ userId: { relationTo: 'other-users', value: 'user-1' } }],
+      })
 
       const result = await field?.hooks?.afterRead?.[0]?.({
         collection: { slug: 'posts' },
@@ -338,7 +400,7 @@ describe('audit log hooks', () => {
         req: { payload: { find } },
       } as any)
 
-      expect(result).toBe('user-1')
+      expect(result).toEqual({ relationTo: 'other-users', value: 'user-1' })
       expect(find).toHaveBeenCalledWith(
         expect.objectContaining({
           collection: 'audit-plugin-logs',
@@ -361,8 +423,18 @@ describe('audit log hooks', () => {
       const field = findCollection(config, 'posts')?.fields[1] as any
       const find = vi.fn().mockResolvedValue({
         docs: [
-          { id: 'log-2', createdAt: '2026-01-02', delta: { title: ['B', 'C'] }, userId: 'user-2' },
-          { id: 'log-1', createdAt: '2026-01-01', delta: { title: ['A', 'B'] }, userId: 'user-1' },
+          {
+            id: 'log-2',
+            createdAt: '2026-01-02',
+            delta: { title: ['B', 'C'] },
+            userId: { relationTo: 'other-users', value: 'user-2' },
+          },
+          {
+            id: 'log-1',
+            createdAt: '2026-01-01',
+            delta: { title: ['A', 'B'] },
+            userId: { relationTo: 'users', value: 'user-1' },
+          },
         ],
       })
 
@@ -373,8 +445,18 @@ describe('audit log hooks', () => {
       } as any)
 
       expect(result).toEqual([
-        { id: 'log-2', date: '2026-01-02', delta: { title: ['B', 'C'] }, user: 'user-2' },
-        { id: 'log-1', date: '2026-01-01', delta: { title: ['A', 'B'] }, user: 'user-1' },
+        {
+          id: 'log-2',
+          date: '2026-01-02',
+          delta: { title: ['B', 'C'] },
+          user: { relationTo: 'other-users', value: 'user-2' },
+        },
+        {
+          id: 'log-1',
+          date: '2026-01-01',
+          delta: { title: ['A', 'B'] },
+          user: { relationTo: 'users', value: 'user-1' },
+        },
       ])
       expect(find).toHaveBeenCalledWith(
         expect.objectContaining({ pagination: false, sort: '-createdAt' }),
