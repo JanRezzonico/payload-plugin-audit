@@ -32,7 +32,7 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
           allowEdit: false,
         },
         label: ui.user.label,
-        relationTo: config.userCollection,
+        relationTo: config.userCollections,
         required: false,
       },
       {

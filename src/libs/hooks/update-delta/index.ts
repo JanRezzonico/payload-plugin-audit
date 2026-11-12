@@ -35,7 +35,7 @@ const generateUpdateDeltaHook = (config: AuditPluginPayloadConfig): CollectionAf
         delta,
         entity: { relationTo: collection.slug, value: doc.id },
         operation: 'update',
-        userId: user.id,
+        userId: { relationTo: user.collection, value: user.id },
       },
       overrideAccess: true,
       req,

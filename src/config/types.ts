@@ -1,5 +1,3 @@
-import type { CollectionSlug } from 'payload'
-
 import type {
   ConfigCanManageAudits,
   ConfigCanSeeAudits,
@@ -10,6 +8,7 @@ import type {
   ConfigCustomizeFields,
   OptionalConfigCustomizeFields,
 } from './customize-fields/types.js'
+import type { IncomingUserCollections, UserCollections } from './user-collections/types.js'
 
 type Slugs = {
   createdByVirtualField: `${Slugs['pluginPrefix']}-created-by`
@@ -57,9 +56,9 @@ type IncomingAuditPluginPayloadConfig = {
   logsCollectionHidden?: ConfigLogsCollectionHidden
 
   /**
-   * The collection slug used for users associated with audit records.
+   * The collection slugs used for users associated with audit records.
    */
-  userCollection: CollectionSlug
+  userCollections: IncomingUserCollections
 }
 
 type AuditPluginPayloadConfig = {
@@ -67,6 +66,7 @@ type AuditPluginPayloadConfig = {
   disabled: false
   logsCollectionHidden: ConfigLogsCollectionHidden
   slugs: Slugs
+  userCollections: UserCollections
 } & IncomingAuditPluginPayloadConfig
 
 export type { AuditPluginPayloadConfig, IncomingAuditPluginPayloadConfig }

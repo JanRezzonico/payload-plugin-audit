@@ -42,7 +42,7 @@ const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field 
     ],
   },
   label: config.customizeFields.createdBy.label,
-  relationTo: config.userCollection,
+  relationTo: config.userCollections,
   virtual: true,
 })
 

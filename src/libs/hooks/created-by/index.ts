@@ -21,7 +21,7 @@ const generateCreatedByHook = (config: AuditPluginPayloadConfig): CollectionAfte
         delta: null, // No delta for create operations
         entity: { relationTo: collection.slug, value: doc.id },
         operation: 'create',
-        userId: user.id,
+        userId: { relationTo: user.collection, value: user.id },
       },
       overrideAccess: true,
       req,

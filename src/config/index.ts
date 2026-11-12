@@ -1,6 +1,7 @@
 import type { AuditPluginPayloadConfig, IncomingAuditPluginPayloadConfig } from './types.js'
 
 import { mergeCustomizeFields } from './customize-fields/index.js'
+import { normalizeUserCollections } from './user-collections/index.js'
 
 const isPluginEnabled = (config: IncomingAuditPluginPayloadConfig): boolean => {
   if (config.disabled) {
@@ -23,6 +24,7 @@ const preparePluginConfig = (
   const customizeFields = mergeCustomizeFields(config.customizeFields)
   const logsCollectionHidden =
     config.logsCollectionHidden === undefined ? false : config.logsCollectionHidden
+  const userCollections = normalizeUserCollections(config.userCollections)
 
   const pluginPrefix = 'audit-plugin'
 
@@ -37,6 +39,7 @@ const preparePluginConfig = (
       pluginPrefix,
       updateDeltaVirtualField: `${pluginPrefix}-update-delta` as const,
     },
+    userCollections,
   }
 }
 

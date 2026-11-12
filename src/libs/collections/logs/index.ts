@@ -32,7 +32,7 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
       {
         name: 'userId',
         type: 'relationship',
-        relationTo: config.userCollection,
+        relationTo: config.userCollections,
         required: true,
       },
       {
