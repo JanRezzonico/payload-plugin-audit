@@ -64,12 +64,14 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    'other-users': OtherUserAuthOperations;
   };
   blocks: {};
   collections: {
     posts: Post;
     media: Media;
     users: User;
+    'other-users': OtherUser;
     'audit-plugin-logs': AuditPluginLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -81,6 +83,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'other-users': OtherUsersSelect<false> | OtherUsersSelect<true>;
     'audit-plugin-logs': AuditPluginLogsSelect<false> | AuditPluginLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -97,13 +100,31 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | OtherUser;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface OtherUserAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -154,6 +175,29 @@ export interface Post {
     | number
     | boolean
     | null;
+  'audit-plugin-created-by'?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  'audit-plugin-update-delta'?:
+    | {
+        user?: {
+          relationTo: 'users';
+          value: number | User;
+        } | null;
+        date?: string | null;
+        delta?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -191,6 +235,29 @@ export interface User {
 export interface Media {
   id: number;
   alt?: string | null;
+  'audit-plugin-created-by'?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  'audit-plugin-update-delta'?:
+    | {
+        user?: {
+          relationTo: 'users';
+          value: number | User;
+        } | null;
+        date?: string | null;
+        delta?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -202,6 +269,33 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "other-users".
+ */
+export interface OtherUser {
+  id: number;
+  role: 'admin' | 'someOtherRole';
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'other-users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -219,7 +313,10 @@ export interface AuditPluginLog {
         relationTo: 'posts';
         value: number | Post;
       };
-  userId: number | User;
+  userId: {
+    relationTo: 'users';
+    value: number | User;
+  };
   delta?:
     | {
         [k: string]: unknown;
@@ -269,14 +366,23 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      } | null)
+    | ({
         relationTo: 'audit-plugin-logs';
         value: number | AuditPluginLog;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -286,10 +392,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      };
   key?: string | null;
   value?:
     | {
@@ -324,6 +435,15 @@ export interface PostsSelect<T extends boolean = true> {
   author?: T;
   media?: T;
   someJson?: T;
+  'audit-plugin-created-by'?: T;
+  'audit-plugin-update-delta'?:
+    | T
+    | {
+        user?: T;
+        date?: T;
+        delta?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -333,6 +453,15 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  'audit-plugin-created-by'?: T;
+  'audit-plugin-update-delta'?:
+    | T
+    | {
+        user?: T;
+        date?: T;
+        delta?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -350,6 +479,30 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "other-users_select".
+ */
+export interface OtherUsersSelect<T extends boolean = true> {
   role?: T;
   updatedAt?: T;
   createdAt?: T;

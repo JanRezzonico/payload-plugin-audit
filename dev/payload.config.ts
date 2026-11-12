@@ -7,6 +7,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Media } from './collections/Media.js'
+import { OtherUsers } from './collections/OtherUsers.js'
 import { Posts } from './collections/Posts.js'
 import { Users } from './collections/Users.js'
 import { seed } from './seed.js'
@@ -21,7 +22,7 @@ export default buildConfig({
       importMapFile: path.resolve(dirname, 'app/(payload)/admin/importMap.js'),
     },
   },
-  collections: [Posts, Media, Users],
+  collections: [Posts, Media, Users, OtherUsers],
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
@@ -37,7 +38,7 @@ export default buildConfig({
       canManageAudits: ({ req }) => req.user?.role === 'admin',
       canSeeAudits: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
       enabledCollections: ['media', 'posts'],
-      userCollection: 'users',
+      userCollections: ['users', 'other-users'],
     }),
   ],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',

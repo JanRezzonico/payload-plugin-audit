@@ -15,7 +15,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'author',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: ['users', 'other-users'],
       required: true,
     },
     {

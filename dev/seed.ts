@@ -23,6 +23,11 @@ export const seed = async (payload: Payload) => {
       collection: 'users',
       data: normalUser,
     })
+
+    await payload.create({
+      collection: 'other-users',
+      data: otherCollectionUser,
+    })
   }
 }
 
@@ -42,4 +47,10 @@ const normalUser = {
   email: 'normal-dev@example.local',
   password: 'test',
   role: 'normal' as const,
+}
+
+const otherCollectionUser = {
+  email: 'other-dev@example.local',
+  password: 'test',
+  role: 'admin' as const,
 }
