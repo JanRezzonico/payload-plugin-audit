@@ -9,26 +9,17 @@ import * as jsonpatchFormatter from 'jsondiffpatch/formatters/jsonpatch'
 import { useMemo } from 'react'
 
 import './DeltaViewer.css'
-import {
-  type ChipVariant,
-  classifyOp,
-  formatPath,
-  formatValue,
-  getOldValue,
-} from './DeltaViewer.utils.js'
 
-type OpKind = 'added' | 'moved' | 'removed' | 'updated'
+import type {
+  DeltaViewerChipVariant,
+  DeltaViewerKindLabels,
+  DeltaViewerLabels,
+  DeltaViewerOpKind,
+} from './DeltaViewer.types.js'
 
-export type DeltaViewerLabels = Record<OpKind, string>
+import { classifyOp, formatPath, formatValue, getOldValue } from './DeltaViewer.utils.js'
 
-type KindLabel = {
-  text: string
-  variant: ChipVariant
-}
-
-type KindLabels = Record<OpKind, KindLabel>
-
-function Chip({ children, variant }: { children: ReactNode; variant: ChipVariant }) {
+function Chip({ children, variant }: { children: ReactNode; variant: DeltaViewerChipVariant }) {
   return (
     <span className="DeltaViewer__chip" data-variant={variant}>
       {children}
@@ -49,7 +40,7 @@ function RawJSON({ value }: { value: unknown }) {
   )
 }
 
-function OpContent({ kind, oldValue, op }: { kind: OpKind; oldValue: unknown; op: Op }) {
+function OpContent({ kind, oldValue, op }: { kind: DeltaViewerOpKind; oldValue: unknown; op: Op }) {
   switch (kind) {
     case 'added':
       return 'value' in op ? <Chip variant="new">{formatValue(op.value)}</Chip> : null
@@ -81,7 +72,15 @@ function OpContent({ kind, oldValue, op }: { kind: OpKind; oldValue: unknown; op
   }
 }
 
-function OpRow({ delta, kindLabels, op }: { delta: Delta; kindLabels: KindLabels; op: Op }) {
+function OpRow({
+  delta,
+  kindLabels,
+  op,
+}: {
+  delta: Delta
+  kindLabels: DeltaViewerKindLabels
+  op: Op
+}) {
   const oldValue = op.op === 'replace' ? getOldValue(delta, op.path) : undefined
   const kind = classifyOp(op, oldValue)
   const { text, variant } = kindLabels[kind]
@@ -119,7 +118,7 @@ type Props = {
 
 function DeltaViewer({ labels, path }: Props) {
   const { value } = useField<Delta>({ path })
-  const kindLabels: KindLabels = {
+  const kindLabels: DeltaViewerKindLabels = {
     added: { text: labels.added, variant: 'new' },
     moved: { text: labels.moved, variant: 'update' },
     removed: { text: labels.removed, variant: 'old' },

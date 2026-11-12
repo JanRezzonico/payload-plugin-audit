@@ -1,7 +1,7 @@
 import type { Delta } from 'jsondiffpatch'
 import type { Op } from 'jsondiffpatch/formatters/jsonpatch'
 
-export type ChipVariant = 'neutral' | 'new' | 'old' | 'update'
+import type { DeltaViewerOpKind } from './DeltaViewer.types.js'
 
 function parsePointer(pointer: string): string[] {
   return pointer
@@ -49,9 +49,7 @@ function isEmptyValue(value: unknown): boolean {
   return false // false, 0 and NaN are real values
 }
 
-export type OpKind = 'added' | 'moved' | 'removed' | 'updated'
-
-export function classifyOp(op: Op, oldValue: unknown): OpKind {
+export function classifyOp(op: Op, oldValue: unknown): DeltaViewerOpKind {
   switch (op.op) {
     case 'add':
       return 'added'

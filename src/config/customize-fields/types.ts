@@ -1,4 +1,4 @@
-import type { DeltaViewerLabels } from 'src/components/DeltaViewer.js'
+import type { DeltaViewerLabels } from 'src/components/DeltaViewer.types.js'
 
 type CreatedBy = {
   label: string
