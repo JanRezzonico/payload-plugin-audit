@@ -16,6 +16,12 @@ export type UpdateDeltaRowLabelLabels = {
   latestChange: string
 }
 
+export const defaultUpdateDeltaRowLabelLabels: UpdateDeltaRowLabelLabels = {
+  changeNumber: 'Change {number}',
+  genericChange: 'Change',
+  latestChange: 'Latest Change',
+}
+
 const fill = (template: string, number: number) => {
   return template.replaceAll('{number}', String(number))
 }

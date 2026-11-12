@@ -1,15 +1,13 @@
+import { defaultDeltaViewerLabels } from 'src/components/DeltaViewer.types.js'
+import { defaultUpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.js'
+
 import type { ConfigCustomizeFields, OptionalConfigCustomizeFields } from './types.js'
 
 const defaultValue = {
   createdBy: {
     label: 'Created By',
   },
-  deltaViewerLabels: {
-    added: 'Added',
-    moved: 'Moved',
-    removed: 'Removed',
-    updated: 'Updated',
-  },
+  deltaViewerLabels: defaultDeltaViewerLabels,
   updateDelta: {
     date: {
       displayFormat: 'dd/MM/yyyy HH:mm:ss',
@@ -23,11 +21,7 @@ const defaultValue = {
       plural: 'Changes',
       singular: 'Change',
     },
-    rowLabels: {
-      changeNumber: 'Change {number}',
-      genericChange: 'Change',
-      latestChange: 'Latest Change',
-    },
+    rowLabels: defaultUpdateDeltaRowLabelLabels,
     user: {
       label: 'User',
     },
