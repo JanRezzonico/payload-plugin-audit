@@ -37,6 +37,14 @@ export default buildConfig({
     auditPluginPayload({
       canManageAudits: ({ req }) => req.user?.role === 'admin',
       canSeeAudits: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
+      customizeFields: {
+        deltaViewerLabels: {
+          added: 'My Custom Added',
+          moved: 'My Custom Moved',
+          // removed: 'My Custom Removed',
+          updated: 'My Custom Updated',
+        },
+      },
       enabledCollections: ['media', 'posts'],
       userCollections: ['users', 'other-users'],
     }),

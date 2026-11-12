@@ -51,7 +51,12 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
         type: 'json',
         admin: {
           components: {
-            Field: 'audit-plugin-payload/client#DeltaViewer',
+            Field: {
+              clientProps: {
+                labels: config.customizeFields.deltaViewerLabels,
+              },
+              path: 'audit-plugin-payload/client#DeltaViewer',
+            },
           },
         },
         label: ui.delta.label,

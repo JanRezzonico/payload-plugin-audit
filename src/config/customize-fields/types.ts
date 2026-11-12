@@ -1,3 +1,5 @@
+import type { DeltaViewerLabels } from 'src/components/DeltaViewer.js'
+
 type CreatedBy = {
   label: string
 }
@@ -30,12 +32,14 @@ type UpdateDelta = {
 
 type ConfigCustomizeFields = {
   createdBy: CreatedBy
+  deltaViewerLabels: DeltaViewerLabels
   updateDelta: UpdateDelta
 }
 
 type OptionalConfigCustomizeFields =
   | Partial<{
       createdBy: Partial<CreatedBy>
+      deltaViewerLabels: Partial<DeltaViewerLabels>
       updateDelta: Partial<{
         date: Partial<UpdateDeltaDate>
         delta: Partial<UpdateDeltaDelta>

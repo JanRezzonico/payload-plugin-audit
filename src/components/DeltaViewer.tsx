@@ -19,12 +19,14 @@ import {
 
 type OpKind = 'added' | 'moved' | 'removed' | 'updated'
 
-const KIND_LABELS: Record<OpKind, { text: string; variant: ChipVariant }> = {
-  added: { text: 'Added', variant: 'new' },
-  moved: { text: 'Moved', variant: 'update' },
-  removed: { text: 'Removed', variant: 'old' },
-  updated: { text: 'Updated', variant: 'update' },
+export type DeltaViewerLabels = Record<OpKind, string>
+
+type KindLabel = {
+  text: string
+  variant: ChipVariant
 }
+
+type KindLabels = Record<OpKind, KindLabel>
 
 function Chip({ children, variant }: { children: ReactNode; variant: ChipVariant }) {
   return (
@@ -79,10 +81,10 @@ function OpContent({ kind, oldValue, op }: { kind: OpKind; oldValue: unknown; op
   }
 }
 
-function OpRow({ delta, op }: { delta: Delta; op: Op }) {
+function OpRow({ delta, kindLabels, op }: { delta: Delta; kindLabels: KindLabels; op: Op }) {
   const oldValue = op.op === 'replace' ? getOldValue(delta, op.path) : undefined
   const kind = classifyOp(op, oldValue)
-  const { text, variant } = KIND_LABELS[kind]
+  const { text, variant } = kindLabels[kind]
 
   return (
     <div className="DeltaViewer__op" data-variant={variant}>
@@ -111,11 +113,18 @@ function Message({ children, value }: { children: ReactNode; value: unknown }) {
 }
 
 type Props = {
+  labels: DeltaViewerLabels
   path: string
 }
 
-function DeltaViewer({ path }: Props) {
+function DeltaViewer({ labels, path }: Props) {
   const { value } = useField<Delta>({ path })
+  const kindLabels: KindLabels = {
+    added: { text: labels.added, variant: 'new' },
+    moved: { text: labels.moved, variant: 'update' },
+    removed: { text: labels.removed, variant: 'old' },
+    updated: { text: labels.updated, variant: 'update' },
+  }
 
   const result = useMemo(() => {
     if (!value) {
@@ -139,7 +148,7 @@ function DeltaViewer({ path }: Props) {
   return (
     <div className="DeltaViewer__container">
       {result.ops.map((op) => (
-        <OpRow delta={value} key={`${op.op}:${op.path}`} op={op} />
+        <OpRow delta={value} key={`${op.op}:${op.path}`} kindLabels={kindLabels} op={op} />
       ))}
       <RawJSON value={value} />
     </div>

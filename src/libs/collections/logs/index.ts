@@ -40,7 +40,12 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
         type: 'json',
         admin: {
           components: {
-            Field: 'audit-plugin-payload/client#DeltaViewer',
+            Field: {
+              clientProps: {
+                labels: config.customizeFields.deltaViewerLabels,
+              },
+              path: 'audit-plugin-payload/client#DeltaViewer',
+            },
           },
         },
         required: false, // No delta for create operations

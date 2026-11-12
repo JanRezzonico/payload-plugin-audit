@@ -4,6 +4,12 @@ const defaultValue = {
   createdBy: {
     label: 'Created By',
   },
+  deltaViewerLabels: {
+    added: 'Added',
+    moved: 'Moved',
+    removed: 'Removed',
+    updated: 'Updated',
+  },
   updateDelta: {
     date: {
       displayFormat: 'dd/MM/yyyy HH:mm:ss',
