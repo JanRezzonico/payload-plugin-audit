@@ -23,6 +23,11 @@ const defaultValue = {
       plural: 'Changes',
       singular: 'Change',
     },
+    rowLabels: {
+      changeNumber: 'Change {number}',
+      genericChange: 'Change',
+      latestChange: 'Latest Change',
+    },
     user: {
       label: 'User',
     },
@@ -32,24 +37,30 @@ const defaultValue = {
 type PlainObject = Record<string, unknown>
 
 const isPlainObject = (value: unknown): value is PlainObject => {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+  const proto = Object.getPrototypeOf(value)
+  return proto === Object.prototype || proto === null
 }
 
-const mergeInto = (target: PlainObject, source?: PlainObject): PlainObject => {
-  for (const [key, value] of Object.entries(source ?? {})) {
+const merge = (base: PlainObject, override?: PlainObject): PlainObject => {
+  const result: PlainObject = { ...base }
+
+  for (const [key, value] of Object.entries(override ?? {})) {
     if (value === undefined) {
       continue
     }
 
-    const current = target[key]
-    target[key] = isPlainObject(current) && isPlainObject(value) ? mergeInto(current, value) : value
+    const current = result[key]
+    result[key] = isPlainObject(current) && isPlainObject(value) ? merge(current, value) : value
   }
-  return target
+
+  return result
 }
 
 const mergeCustomizeFields = (options?: OptionalConfigCustomizeFields): ConfigCustomizeFields => {
-  const defaultClone = structuredClone(defaultValue) // Avoid mutating the default value
-  return mergeInto(defaultClone, options) as ConfigCustomizeFields
+  return merge(defaultValue, options) as ConfigCustomizeFields
 }
 
 export { mergeCustomizeFields }

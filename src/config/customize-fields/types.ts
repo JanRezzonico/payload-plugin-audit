@@ -1,4 +1,5 @@
 import type { DeltaViewerLabels } from 'src/components/DeltaViewer.types.js'
+import type { UpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.js'
 
 type CreatedBy = {
   label: string
@@ -27,6 +28,7 @@ type UpdateDelta = {
   delta: UpdateDeltaDelta
   label: string
   labels: UpdateDeltaLabels
+  rowLabels: UpdateDeltaRowLabelLabels
   user: UpdateDeltaUser
 }
 
@@ -45,6 +47,7 @@ type OptionalConfigCustomizeFields =
         delta: Partial<UpdateDeltaDelta>
         label: string
         labels: Partial<UpdateDeltaLabels>
+        rowLabels: Partial<UpdateDeltaRowLabelLabels>
         user: Partial<UpdateDeltaUser>
       }>
     }>

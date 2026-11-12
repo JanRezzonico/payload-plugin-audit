@@ -44,6 +44,13 @@ export default buildConfig({
           // removed: 'My Custom Removed',
           updated: 'My Custom Updated',
         },
+        updateDelta: {
+          rowLabels: {
+            changeNumber: 'My Custom Change ({number}), yes its {number}',
+            genericChange: 'My Custom Change',
+            latestChange: 'My Custom Latest Change ({number})',
+          },
+        },
       },
       enabledCollections: ['media', 'posts'],
       userCollections: ['users', 'other-users'],
