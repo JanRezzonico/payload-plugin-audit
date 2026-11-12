@@ -1,6 +1,6 @@
 import type { AuditPluginPayloadConfig, IncomingAuditPluginPayloadConfig } from './types.js'
 
-import { mergeCustomizeFields } from './customize-fields/index.js'
+import { mergeCustomizeFields } from './customize-fields/merge.js'
 import { normalizeUserCollections } from './user-collections/index.js'
 
 const isPluginEnabled = (config: IncomingAuditPluginPayloadConfig): boolean => {
