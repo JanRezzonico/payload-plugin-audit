@@ -1,5 +1,6 @@
 import type { DeltaViewerLabels } from 'src/components/DeltaViewer.types.js'
 import type { UpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.js'
+import type { UserDescriptionLabels } from 'src/components/UserDescription.types.js'
 
 type LabelOnly = { label: string }
 
@@ -14,6 +15,7 @@ type ConfigCustomizeFields = {
     rowLabels: UpdateDeltaRowLabelLabels
     user: LabelOnly
   }
+  userDescriptionLabels: UserDescriptionLabels
 }
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }

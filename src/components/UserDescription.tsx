@@ -3,7 +3,9 @@
 import { useConfig, useFormFields } from '@payloadcms/ui'
 import { formatAdminURL } from 'payload/shared'
 
-const UserDescription = ({ path }: { path: string }) => {
+import type { UserDescriptionLabels } from './UserDescription.types.js'
+
+const UserDescription = ({ labels, path }: { labels: UserDescriptionLabels; path: string }) => {
   const { config } = useConfig()
   const value = useFormFields(([fields]) => fields[path]?.value)
   const isObject = value && typeof value === 'object' && !Array.isArray(value)
@@ -30,14 +32,14 @@ const UserDescription = ({ path }: { path: string }) => {
     <div className="field-description">
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <div>
-          <span>User id: </span>
+          <span>{`${labels.userIdPrefix.trim()} `}</span>
           <a href={userHref} rel="noopener noreferrer">
             {userId}
           </a>
         </div>
         <span>|</span>
         <div>
-          <span>Collection: </span>
+          <span>{`${labels.collectionSlugPrefix.trim()} `}</span>
           <a href={collectionHref} rel="noopener noreferrer">
             {collectionSlug}
           </a>

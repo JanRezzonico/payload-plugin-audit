@@ -51,6 +51,10 @@ export default buildConfig({
             latestChange: 'My Custom Latest Change ({number})',
           },
         },
+        userDescriptionLabels: {
+          collectionSlugPrefix: 'The user is from the collection:',
+          userIdPrefix: 'The user has the id:',
+        },
       },
       enabledCollections: ['media', 'posts'],
       userCollections: ['users', 'other-users'],

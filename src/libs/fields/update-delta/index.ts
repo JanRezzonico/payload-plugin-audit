@@ -37,7 +37,12 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
           allowEdit: false,
           appearance: 'drawer',
           components: {
-            Description: 'audit-plugin-payload/client#UserDescription',
+            Description: {
+              clientProps: {
+                labels: config.customizeFields.userDescriptionLabels,
+              },
+              path: 'audit-plugin-payload/client#UserDescription',
+            },
           },
         },
         label: ui.user.label,
