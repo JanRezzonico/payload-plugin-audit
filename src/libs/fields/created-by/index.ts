@@ -13,6 +13,9 @@ const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field 
     allowCreate: false,
     allowEdit: false,
     appearance: 'drawer',
+    components: {
+      Description: 'audit-plugin-payload/client#UserDescription',
+    },
     condition: (data) => Boolean(data?.id), // Hide on create ops
     readOnly: true,
   },
