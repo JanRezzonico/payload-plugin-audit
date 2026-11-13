@@ -32,7 +32,7 @@ export const auditPluginPayload =
       if (collection.slug === pluginConfig.custom.auditLogCollectionSlug) {
         return // Probably not needed, but just in case, we don't want to add hooks to the logs collection itself
       }
-      if (!pluginConfig.enabledCollections.includes(collection.slug)) {
+      if (!pluginConfig.collections.includes(collection.slug)) {
         return
       }
 

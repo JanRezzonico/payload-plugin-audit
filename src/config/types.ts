@@ -21,6 +21,11 @@ type IncomingAuditPluginPayloadConfig = {
   canSeeAudits: ConfigCanSeeAudits
 
   /**
+   * Collections that should receive audit logging.
+   */
+  collections: EnabledCollections
+
+  /**
    * Customizes labels and date formatting for fields added by the plugin.
    */
   custom?: OptionalConfigCustom
@@ -31,11 +36,6 @@ type IncomingAuditPluginPayloadConfig = {
    * @default false
    */
   disabled?: boolean
-
-  /**
-   * Collections that should receive audit logging.
-   */
-  enabledCollections: EnabledCollections
 
   /**
    * Hides the audit logs collection from the Payload admin panel when true.

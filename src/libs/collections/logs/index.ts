@@ -26,7 +26,7 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
         type: 'relationship',
         index: true,
         // Polymorphic relationship to all enabled collections
-        relationTo: config.enabledCollections,
+        relationTo: config.collections,
         required: true,
       },
       {

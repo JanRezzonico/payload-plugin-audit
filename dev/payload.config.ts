@@ -37,6 +37,7 @@ export default buildConfig({
     auditPluginPayload({
       canManageAudits: ({ req }) => req.user?.role === 'admin',
       canSeeAudits: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
+      collections: ['media', 'posts'],
       custom: {
         auditLogCollectionSlug: 'my-custom-audit-logs',
         deltaViewerLabels: {
@@ -61,7 +62,8 @@ export default buildConfig({
           userIdPrefix: 'The user has the id:',
         },
       },
-      enabledCollections: ['media', 'posts'],
+      disabled: false,
+      logsCollectionHidden: false,
       userCollections: ['users', 'other-users'],
     }),
   ],

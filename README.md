@@ -40,18 +40,18 @@ export default buildConfig({
       canSeeAudits: ({ req }) => {
         return ['admin', 'viewer'].includes(req.user?.role ?? '')
       },
-      enabledCollections: ['posts', 'media'],
+      collections: ['posts', 'media'],
       userCollection: 'users',
     }),
   ],
 })
 ```
 
-The plugin adds the audit hooks and virtual fields only to collections listed in `enabledCollections`. Audit entries are created when a logged-in user creates or updates a document.
+The plugin adds the audit hooks and virtual fields only to collections listed in `collections`. Audit entries are created when a logged-in user creates or updates a document.
 
 ## Options
 
-- `enabledCollections`: Collection slugs to audit. At least one collection is required.
+- `collections`: Collection slugs to audit. At least one collection is required.
 - `userCollection`: Collection slug of the users collection.
 - `canSeeAudits`: Payload access control function for reading audit logs and virtual audit fields.
 - `canManageAudits`: Payload access control function for creating, updating, and deleting audit logs manually.

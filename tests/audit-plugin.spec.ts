@@ -30,7 +30,7 @@ const deepFreeze = <T>(value: T): T => {
 const basePluginConfig = {
   canManageAudits,
   canSeeAudits,
-  enabledCollections: ['posts'],
+  collections: ['posts'],
   userCollections: 'users',
 }
 
@@ -138,7 +138,7 @@ describe('auditPluginPayload config transform', () => {
 
   test('configures log access and relationships', () => {
     const config = applyPlugin([{ slug: 'posts', fields: [] }], {
-      enabledCollections: ['posts', 'media'],
+      collections: ['posts', 'media'],
     })
     const logs = getLogCollection(config)
     const entity = logs?.fields.find((field) => 'name' in field && field.name === 'entity')
@@ -189,7 +189,7 @@ describe('auditPluginPayload config transform', () => {
     expect(() => preparePluginConfig({ ...basePluginConfig, disabled: true })).toThrow(
       'Invalid audit plugin configuration',
     )
-    expect(() => preparePluginConfig({ ...basePluginConfig, enabledCollections: [] })).toThrow(
+    expect(() => preparePluginConfig({ ...basePluginConfig, collections: [] })).toThrow(
       'Invalid audit plugin configuration',
     )
   })
@@ -199,7 +199,7 @@ describe('plugin option helpers', () => {
   test('only enables the plugin for active collections', () => {
     expect(isPluginEnabled(basePluginConfig)).toBe(true)
     expect(isPluginEnabled({ ...basePluginConfig, disabled: true })).toBe(false)
-    expect(isPluginEnabled({ ...basePluginConfig, enabledCollections: [] })).toBe(false)
+    expect(isPluginEnabled({ ...basePluginConfig, collections: [] })).toBe(false)
   })
 
   test('prepares stable plugin values and merged customization', () => {
@@ -209,6 +209,7 @@ describe('plugin option helpers', () => {
     })
 
     expect(prepared).toMatchObject({
+      collections: ['posts'],
       custom: {
         auditLogCollectionSlug: 'audit-plugin-logs',
         fieldNames: {
@@ -221,7 +222,6 @@ describe('plugin option helpers', () => {
         },
       },
       disabled: false,
-      enabledCollections: ['posts'],
       logsCollectionHidden: false,
       userCollections: ['users'],
     })

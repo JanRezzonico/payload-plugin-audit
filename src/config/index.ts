@@ -8,7 +8,7 @@ const isPluginEnabled = (config: IncomingAuditPluginPayloadConfig): boolean => {
     return false
   }
 
-  if (config.enabledCollections.length === 0) {
+  if (config.collections.length === 0) {
     return false
   }
 
