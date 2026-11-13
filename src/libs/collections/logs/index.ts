@@ -34,6 +34,17 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
         type: 'relationship',
         relationTo: config.userCollections,
         required: true,
+
+        admin: {
+          components: {
+            Description: {
+              clientProps: {
+                labels: config.custom.userDescriptionLabels,
+              },
+              path: 'audit-plugin-payload/client#UserDescription',
+            },
+          },
+        },
       },
       {
         name: 'delta',
