@@ -6,7 +6,7 @@ const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field 
   type: 'relationship',
   access: {
     create: () => false, // No create of virtual field allowed
-    read: config.canSeeAudits,
+    read: config.access.read,
     update: () => false, // No update of virtual field allowed
   },
   admin: {

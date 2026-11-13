@@ -5,10 +5,10 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
   return {
     slug: config.custom.auditLogCollectionSlug,
     access: {
-      create: config.canManageAudits,
-      delete: config.canManageAudits,
-      read: config.canSeeAudits,
-      update: config.canManageAudits,
+      create: config.access.manage,
+      delete: config.access.manage,
+      read: config.access.read,
+      update: config.access.manage,
     },
     admin: {
       defaultColumns: ['operation', 'entity', 'userId', 'createdAt'],

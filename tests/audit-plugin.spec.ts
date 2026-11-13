@@ -7,12 +7,6 @@ import { isPluginEnabled, preparePluginConfig } from '../src/config/index.js'
 import { normalizeUserCollections } from '../src/config/user-collections/index.js'
 import { auditPluginPayload } from '../src/index.js'
 
-const canManageAudits = ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
-  user?.role === 'admin'
-
-const canSeeAudits = ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
-  user?.role === 'admin' || user?.role === 'editor'
-
 const createConfig = (collections: NonNullable<Config['collections']>): Config => ({
   collections,
   db: {} as Config['db'],
@@ -28,8 +22,12 @@ const deepFreeze = <T>(value: T): T => {
 }
 
 const basePluginConfig = {
-  canManageAudits,
-  canSeeAudits,
+  access: {
+    manage: ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
+      user?.role === 'admin',
+    read: ({ req: { user } }: { req: { user?: { role?: string } | null } }) =>
+      ['admin', 'viewer'].includes(user?.role || ''),
+  },
   collections: ['posts'],
   userCollections: 'users',
 }
@@ -147,7 +145,7 @@ describe('auditPluginPayload config transform', () => {
     expect(logs?.access?.create?.({ req: { user: { role: 'admin' } } } as any)).toBe(true)
     expect(logs?.access?.update?.({ req: { user: { role: 'editor' } } } as any)).toBe(false)
     expect(logs?.access?.read?.({ req: { user: { role: 'admin' } } } as any)).toBe(true)
-    expect(logs?.access?.read?.({ req: { user: { role: 'editor' } } } as any)).toBe(true)
+    expect(logs?.access?.read?.({ req: { user: { role: 'editor' } } } as any)).toBe(false)
     expect(logs?.access?.delete?.({ req: { user: { role: 'editor' } } } as any)).toBe(false)
     expect(entity).toMatchObject({ relationTo: ['posts', 'media'] })
     expect(userId).toMatchObject({ relationTo: ['users'] })

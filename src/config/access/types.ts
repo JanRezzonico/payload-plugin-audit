@@ -1,7 +1,7 @@
 import type { Access, CollectionConfig, FieldAccess } from 'payload'
 
-type ConfigCanSeeAudits = Access & FieldAccess
-type ConfigCanManageAudits = Access & FieldAccess
+type AccessRead = Access & FieldAccess
+type AccessManage = Access & FieldAccess
 type ConfigLogsCollectionHidden = NonNullable<CollectionConfig['admin']>['hidden']
 
-export type { ConfigCanManageAudits, ConfigCanSeeAudits, ConfigLogsCollectionHidden }
+export type { AccessManage, AccessRead, ConfigLogsCollectionHidden }

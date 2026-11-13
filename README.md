@@ -36,9 +36,9 @@ export default buildConfig({
   collections: [Users, Posts, Media],
   plugins: [
     auditPluginPayload({
-      canManageAudits: ({ req }) => req.user?.role === 'admin',
-      canSeeAudits: ({ req }) => {
-        return ['admin', 'viewer'].includes(req.user?.role ?? '')
+      access: {
+        manage: ({ req }) => req.user?.role === 'admin',
+        read: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
       },
       collections: ['posts', 'media'],
       userCollection: 'users',
@@ -53,8 +53,7 @@ The plugin adds the audit hooks and virtual fields only to collections listed in
 
 - `collections`: Collection slugs to audit. At least one collection is required.
 - `userCollection`: Collection slug of the users collection.
-- `canSeeAudits`: Payload access control function for reading audit logs and virtual audit fields.
-- `canManageAudits`: Payload access control function for creating, updating, and deleting audit logs manually.
+- `access`: Object with `manage` and `read` properties, each being a Payload access control function.
 - `disabled`: Set to `true` to disable the plugin.
 - `logsCollectionHidden`: Hide `audit-plugin-logs` from the admin panel for everyone or with granular access control.
 - `custom`: Customize labels, date formatting, and other options for fields added by the plugin.

@@ -35,8 +35,10 @@ export default buildConfig({
   },
   plugins: [
     auditPluginPayload({
-      canManageAudits: ({ req }) => req.user?.role === 'admin',
-      canSeeAudits: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
+      access: {
+        manage: ({ req }) => req.user?.role === 'admin',
+        read: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
+      },
       collections: ['media', 'posts'],
       custom: {
         auditLogCollectionSlug: 'my-custom-audit-logs',

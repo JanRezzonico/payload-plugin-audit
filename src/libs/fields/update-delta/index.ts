@@ -8,7 +8,7 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
     type: 'array',
     access: {
       create: () => false, // No create of virtual field allowed
-      read: config.canSeeAudits,
+      read: config.access.read,
       update: () => false, // No update of virtual field allowed
     },
     admin: {
