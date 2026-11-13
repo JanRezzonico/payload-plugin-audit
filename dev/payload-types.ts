@@ -164,7 +164,15 @@ export interface Post {
     };
     [k: string]: unknown;
   } | null;
-  author: number | User;
+  author:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      };
   media?: (number | Media)[] | null;
   someJson?:
     | {
@@ -175,16 +183,26 @@ export interface Post {
     | number
     | boolean
     | null;
-  'audit-plugin-created-by'?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
+  'audit-plugin-created-by'?:
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      } | null);
   'audit-plugin-update-delta'?:
     | {
-        user?: {
-          relationTo: 'users';
-          value: number | User;
-        } | null;
+        user?:
+          | ({
+              relationTo: 'users';
+              value: number | User;
+            } | null)
+          | ({
+              relationTo: 'other-users';
+              value: number | OtherUser;
+            } | null);
         date?: string | null;
         delta?:
           | {
@@ -230,48 +248,6 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt?: string | null;
-  'audit-plugin-created-by'?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
-  'audit-plugin-update-delta'?:
-    | {
-        user?: {
-          relationTo: 'users';
-          value: number | User;
-        } | null;
-        date?: string | null;
-        delta?:
-          | {
-              [k: string]: unknown;
-            }
-          | unknown[]
-          | string
-          | number
-          | boolean
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "other-users".
  */
 export interface OtherUser {
@@ -299,6 +275,58 @@ export interface OtherUser {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt?: string | null;
+  'audit-plugin-created-by'?:
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      } | null);
+  'audit-plugin-update-delta'?:
+    | {
+        user?:
+          | ({
+              relationTo: 'users';
+              value: number | User;
+            } | null)
+          | ({
+              relationTo: 'other-users';
+              value: number | OtherUser;
+            } | null);
+        date?: string | null;
+        delta?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-plugin-logs".
  */
 export interface AuditPluginLog {
@@ -313,10 +341,15 @@ export interface AuditPluginLog {
         relationTo: 'posts';
         value: number | Post;
       };
-  userId: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  userId:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      };
   delta?:
     | {
         [k: string]: unknown;

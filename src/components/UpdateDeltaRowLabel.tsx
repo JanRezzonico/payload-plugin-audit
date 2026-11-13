@@ -1,26 +1,7 @@
 'use client'
 import { useFormFields, useRowLabel } from '@payloadcms/ui'
 
-export type UpdateDeltaRowLabelLabels = {
-  /**
-   * Template for a change row. `{number}` is replaced with the change number.
-   */
-  changeNumber: string
-  /**
-   * Fallback when the row number is undefined.
-   */
-  genericChange: string
-  /**
-   * Label for the latest change row.
-   */
-  latestChange: string
-}
-
-export const defaultUpdateDeltaRowLabelLabels: UpdateDeltaRowLabelLabels = {
-  changeNumber: 'Change {number}',
-  genericChange: 'Change',
-  latestChange: 'Latest Change',
-}
+import type { UpdateDeltaRowLabelLabels } from './UpdateDeltaRowLabel.types.js'
 
 const fill = (template: string, number: number) => {
   return template.replaceAll('{number}', String(number))

@@ -1,5 +1,5 @@
 import type { DeltaViewerLabels } from 'src/components/DeltaViewer.types.js'
-import type { UpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.js'
+import type { UpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.types.js'
 import type { UserDescriptionLabels } from 'src/components/UserDescription.types.js'
 
 type LabelOnly = { label: string }

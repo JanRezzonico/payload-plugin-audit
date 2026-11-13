@@ -20,12 +20,6 @@ export default defineConfig(() => {
       environment: 'node',
       hookTimeout: 30_000,
       testTimeout: 30_000,
-      server: {
-        deps: {
-          // Avoid tests failing due to css files from these packages
-          inline: [/react-image-crop/, /@payloadcms\/ui/, /@payloadcms\/next/],
-        },
-      },
     },
   }
 })

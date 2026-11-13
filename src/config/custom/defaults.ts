@@ -1,5 +1,5 @@
 import { defaultDeltaViewerLabels } from 'src/components/DeltaViewer.types.js'
-import { defaultUpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.js'
+import { defaultUpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.types.js'
 import { defaultUserDescriptionLabels } from 'src/components/UserDescription.types.js'
 
 import type { ConfigCustom } from './types.js'
