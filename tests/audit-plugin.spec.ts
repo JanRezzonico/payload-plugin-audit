@@ -205,11 +205,11 @@ describe('plugin option helpers', () => {
   test('prepares stable plugin values and merged customization', () => {
     const prepared = preparePluginConfig({
       ...basePluginConfig,
-      customizeFields: { updateDelta: { delta: { label: 'Diff' } } },
+      custom: { updateDelta: { delta: { label: 'Diff' } } },
     })
 
     expect(prepared).toMatchObject({
-      customizeFields: {
+      custom: {
         updateDelta: {
           date: { label: 'Date' },
           delta: { label: 'Diff' },

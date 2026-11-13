@@ -1,6 +1,6 @@
 import type { AuditPluginPayloadConfig, IncomingAuditPluginPayloadConfig } from './types.js'
 
-import { mergeCustomizeFields } from './customize-fields/merge.js'
+import { mergeCustom } from './custom/merge.js'
 import { normalizeUserCollections } from './user-collections/index.js'
 
 const isPluginEnabled = (config: IncomingAuditPluginPayloadConfig): boolean => {
@@ -21,7 +21,7 @@ const preparePluginConfig = (
   if (!isPluginEnabled(config)) {
     throw new Error('Invalid audit plugin configuration')
   }
-  const customizeFields = mergeCustomizeFields(config.customizeFields)
+  const custom = mergeCustom(config.custom)
   const logsCollectionHidden =
     config.logsCollectionHidden === undefined ? false : config.logsCollectionHidden
   const userCollections = normalizeUserCollections(config.userCollections)
@@ -30,7 +30,7 @@ const preparePluginConfig = (
 
   return {
     ...config,
-    customizeFields,
+    custom,
     disabled: false,
     logsCollectionHidden,
     slugs: {

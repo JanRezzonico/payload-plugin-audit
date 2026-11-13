@@ -1,6 +1,6 @@
-import type { ConfigCustomizeFields, OptionalConfigCustomizeFields } from './types.js'
+import type { ConfigCustom, OptionalConfigCustom } from './types.js'
 
-import { defaultCustomizeFields } from './defaults.js'
+import { defaultCustom } from './defaults.js'
 
 type PlainObject = Record<string, unknown>
 
@@ -24,8 +24,6 @@ const merge = (base: PlainObject, override: PlainObject = {}): PlainObject => {
   return result
 }
 
-export const mergeCustomizeFields = (
-  options?: OptionalConfigCustomizeFields,
-): ConfigCustomizeFields => {
-  return merge(defaultCustomizeFields, options) as ConfigCustomizeFields
+export const mergeCustom = (options?: OptionalConfigCustom): ConfigCustom => {
+  return merge(defaultCustom, options) as ConfigCustom
 }

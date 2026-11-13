@@ -42,7 +42,7 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
           components: {
             Field: {
               clientProps: {
-                labels: config.customizeFields.deltaViewerLabels,
+                labels: config.custom.deltaViewerLabels,
               },
               path: 'audit-plugin-payload/client#DeltaViewer',
             },

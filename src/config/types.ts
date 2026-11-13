@@ -4,10 +4,7 @@ import type {
   ConfigLogsCollectionHidden,
 } from './access/types.js'
 import type { EnabledCollections } from './collection-configs/types.js'
-import type {
-  ConfigCustomizeFields,
-  OptionalConfigCustomizeFields,
-} from './customize-fields/types.js'
+import type { ConfigCustom, OptionalConfigCustom } from './custom/types.js'
 import type { IncomingUserCollections, UserCollections } from './user-collections/types.js'
 
 type Slugs = {
@@ -33,7 +30,7 @@ type IncomingAuditPluginPayloadConfig = {
   /**
    * Customizes labels and date formatting for fields added by the plugin.
    */
-  customizeFields?: OptionalConfigCustomizeFields
+  custom?: OptionalConfigCustom
 
   /**
    * Disables the plugin when set to true.
@@ -62,7 +59,7 @@ type IncomingAuditPluginPayloadConfig = {
 }
 
 type AuditPluginPayloadConfig = {
-  customizeFields: ConfigCustomizeFields
+  custom: ConfigCustom
   disabled: false
   logsCollectionHidden: ConfigLogsCollectionHidden
   slugs: Slugs

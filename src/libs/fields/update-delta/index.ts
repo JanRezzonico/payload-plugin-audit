@@ -2,7 +2,7 @@ import type { Field } from 'payload'
 import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Field => {
-  const ui = config.customizeFields.updateDelta
+  const ui = config.custom.updateDelta
   return {
     name: config.slugs.updateDeltaVirtualField,
     type: 'array',
@@ -39,7 +39,7 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
           components: {
             Description: {
               clientProps: {
-                labels: config.customizeFields.userDescriptionLabels,
+                labels: config.custom.userDescriptionLabels,
               },
               path: 'audit-plugin-payload/client#UserDescription',
             },
@@ -67,7 +67,7 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
           components: {
             Field: {
               clientProps: {
-                labels: config.customizeFields.deltaViewerLabels,
+                labels: config.custom.deltaViewerLabels,
               },
               path: 'audit-plugin-payload/client#DeltaViewer',
             },

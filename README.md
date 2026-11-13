@@ -57,4 +57,4 @@ The plugin adds the audit hooks and virtual fields only to collections listed in
 - `canManageAudits`: Payload access control function for creating, updating, and deleting audit logs manually.
 - `disabled`: Set to `true` to disable the plugin.
 - `logsCollectionHidden`: Hide `audit-plugin-logs` from the admin panel for everyone or with granular access control.
-- `customizeFields`: Customize labels and date formatting for the added fields.
+- `custom`: Customize labels, date formatting, and other options for fields added by the plugin.

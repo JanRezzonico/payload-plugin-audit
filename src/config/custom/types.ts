@@ -4,7 +4,7 @@ import type { UserDescriptionLabels } from 'src/components/UserDescription.types
 
 type LabelOnly = { label: string }
 
-type ConfigCustomizeFields = {
+type ConfigCustom = {
   createdBy: LabelOnly
   deltaViewerLabels: DeltaViewerLabels
   updateDelta: {
@@ -20,6 +20,6 @@ type ConfigCustomizeFields = {
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }
 
-type OptionalConfigCustomizeFields = DeepPartial<ConfigCustomizeFields> | undefined
+type OptionalConfigCustom = DeepPartial<ConfigCustom> | undefined
 
-export type { ConfigCustomizeFields, OptionalConfigCustomizeFields }
+export type { ConfigCustom, OptionalConfigCustom }

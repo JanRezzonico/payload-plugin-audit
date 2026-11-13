@@ -16,7 +16,7 @@ const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field 
     components: {
       Description: {
         clientProps: {
-          labels: config.customizeFields.userDescriptionLabels,
+          labels: config.custom.userDescriptionLabels,
         },
         path: 'audit-plugin-payload/client#UserDescription',
       },
@@ -49,7 +49,7 @@ const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field 
       },
     ],
   },
-  label: config.customizeFields.createdBy.label,
+  label: config.custom.createdBy.label,
   relationTo: config.userCollections,
   virtual: true,
 })

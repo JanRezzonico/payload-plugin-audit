@@ -2,9 +2,9 @@ import { defaultDeltaViewerLabels } from 'src/components/DeltaViewer.types.js'
 import { defaultUpdateDeltaRowLabelLabels } from 'src/components/UpdateDeltaRowLabel.js'
 import { defaultUserDescriptionLabels } from 'src/components/UserDescription.types.js'
 
-import type { ConfigCustomizeFields } from './types.js'
+import type { ConfigCustom } from './types.js'
 
-const defaultCustomizeFields = {
+const defaultCustom: ConfigCustom = {
   createdBy: {
     label: 'Created By',
   },
@@ -28,6 +28,6 @@ const defaultCustomizeFields = {
     },
   },
   userDescriptionLabels: defaultUserDescriptionLabels,
-} satisfies ConfigCustomizeFields
+} satisfies ConfigCustom
 
-export { defaultCustomizeFields }
+export { defaultCustom }
