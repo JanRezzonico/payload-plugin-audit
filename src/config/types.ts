@@ -7,13 +7,6 @@ import type { EnabledCollections } from './collection-configs/types.js'
 import type { ConfigCustom, OptionalConfigCustom } from './custom/types.js'
 import type { IncomingUserCollections, UserCollections } from './user-collections/types.js'
 
-type Slugs = {
-  createdByVirtualField: `${Slugs['pluginPrefix']}-created-by`
-  logsCollection: `${Slugs['pluginPrefix']}-logs`
-  pluginPrefix: 'audit-plugin'
-  updateDeltaVirtualField: `${Slugs['pluginPrefix']}-update-delta`
-}
-
 type IncomingAuditPluginPayloadConfig = {
   /**
    * Payload access control function.
@@ -62,7 +55,6 @@ type AuditPluginPayloadConfig = {
   custom: ConfigCustom
   disabled: false
   logsCollectionHidden: ConfigLogsCollectionHidden
-  slugs: Slugs
   userCollections: UserCollections
 } & IncomingAuditPluginPayloadConfig
 

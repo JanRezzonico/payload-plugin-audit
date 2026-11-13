@@ -38,11 +38,16 @@ export default buildConfig({
       canManageAudits: ({ req }) => req.user?.role === 'admin',
       canSeeAudits: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
       custom: {
+        auditLogCollectionSlug: 'my-custom-audit-logs',
         deltaViewerLabels: {
           added: 'My Custom Added',
           moved: 'My Custom Moved',
           // removed: 'My Custom Removed',
           updated: 'My Custom Updated',
+        },
+        fieldNames: {
+          createdBy: 'myCustomCreatedBy',
+          updateDelta: 'myCustomUpdateDelta',
         },
         updateDelta: {
           rowLabels: {

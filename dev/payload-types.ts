@@ -72,7 +72,7 @@ export interface Config {
     media: Media;
     users: User;
     'other-users': OtherUser;
-    'audit-plugin-logs': AuditPluginLog;
+    'my-custom-audit-logs': MyCustomAuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,7 +84,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'other-users': OtherUsersSelect<false> | OtherUsersSelect<true>;
-    'audit-plugin-logs': AuditPluginLogsSelect<false> | AuditPluginLogsSelect<true>;
+    'my-custom-audit-logs': MyCustomAuditLogsSelect<false> | MyCustomAuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -183,7 +183,7 @@ export interface Post {
     | number
     | boolean
     | null;
-  'audit-plugin-created-by'?:
+  myCustomCreatedBy?:
     | ({
         relationTo: 'users';
         value: number | User;
@@ -192,7 +192,7 @@ export interface Post {
         relationTo: 'other-users';
         value: number | OtherUser;
       } | null);
-  'audit-plugin-update-delta'?:
+  myCustomUpdateDelta?:
     | {
         user?:
           | ({
@@ -280,7 +280,7 @@ export interface OtherUser {
 export interface Media {
   id: number;
   alt?: string | null;
-  'audit-plugin-created-by'?:
+  myCustomCreatedBy?:
     | ({
         relationTo: 'users';
         value: number | User;
@@ -289,7 +289,7 @@ export interface Media {
         relationTo: 'other-users';
         value: number | OtherUser;
       } | null);
-  'audit-plugin-update-delta'?:
+  myCustomUpdateDelta?:
     | {
         user?:
           | ({
@@ -327,9 +327,9 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-plugin-logs".
+ * via the `definition` "my-custom-audit-logs".
  */
-export interface AuditPluginLog {
+export interface MyCustomAuditLog {
   id: number;
   operation: 'create' | 'update';
   entity:
@@ -403,8 +403,8 @@ export interface PayloadLockedDocument {
         value: number | OtherUser;
       } | null)
     | ({
-        relationTo: 'audit-plugin-logs';
-        value: number | AuditPluginLog;
+        relationTo: 'my-custom-audit-logs';
+        value: number | MyCustomAuditLog;
       } | null);
   globalSlug?: string | null;
   user:
@@ -468,8 +468,8 @@ export interface PostsSelect<T extends boolean = true> {
   author?: T;
   media?: T;
   someJson?: T;
-  'audit-plugin-created-by'?: T;
-  'audit-plugin-update-delta'?:
+  myCustomCreatedBy?: T;
+  myCustomUpdateDelta?:
     | T
     | {
         user?: T;
@@ -486,8 +486,8 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  'audit-plugin-created-by'?: T;
-  'audit-plugin-update-delta'?:
+  myCustomCreatedBy?: T;
+  myCustomUpdateDelta?:
     | T
     | {
         user?: T;
@@ -557,9 +557,9 @@ export interface OtherUsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-plugin-logs_select".
+ * via the `definition` "my-custom-audit-logs_select".
  */
-export interface AuditPluginLogsSelect<T extends boolean = true> {
+export interface MyCustomAuditLogsSelect<T extends boolean = true> {
   operation?: T;
   entity?: T;
   userId?: T;

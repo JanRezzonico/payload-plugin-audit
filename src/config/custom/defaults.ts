@@ -5,10 +5,15 @@ import { defaultUserDescriptionLabels } from 'src/components/UserDescription.typ
 import type { ConfigCustom } from './types.js'
 
 const defaultCustom: ConfigCustom = {
+  auditLogCollectionSlug: 'audit-plugin-logs',
   createdBy: {
     label: 'Created By',
   },
   deltaViewerLabels: defaultDeltaViewerLabels,
+  fieldNames: {
+    createdBy: 'auditPluginCreatedBy',
+    updateDelta: 'auditPluginUpdateDelta',
+  },
   updateDelta: {
     date: {
       displayFormat: 'dd/MM/yyyy HH:mm:ss',

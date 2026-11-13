@@ -104,7 +104,7 @@ describe('auditPluginPayload config transform', () => {
     expect(config.collections).toHaveLength(3)
     expect(
       findCollection(config, 'posts')?.fields.map((field) => 'name' in field && field.name),
-    ).toEqual(['title', 'audit-plugin-created-by', 'audit-plugin-update-delta'])
+    ).toEqual(['title', 'auditPluginCreatedBy', 'auditPluginUpdateDelta'])
     expect(findCollection(config, 'media')).toMatchObject({ fields: [] })
     expect(logs).toMatchObject({ slug: 'audit-plugin-logs', timestamps: true })
     expect(logs?.fields.map((field) => 'name' in field && field.name)).toEqual([
@@ -210,6 +210,11 @@ describe('plugin option helpers', () => {
 
     expect(prepared).toMatchObject({
       custom: {
+        auditLogCollectionSlug: 'audit-plugin-logs',
+        fieldNames: {
+          createdBy: 'auditPluginCreatedBy',
+          updateDelta: 'auditPluginUpdateDelta',
+        },
         updateDelta: {
           date: { label: 'Date' },
           delta: { label: 'Diff' },
@@ -218,12 +223,6 @@ describe('plugin option helpers', () => {
       disabled: false,
       enabledCollections: ['posts'],
       logsCollectionHidden: false,
-      slugs: {
-        createdByVirtualField: 'audit-plugin-created-by',
-        logsCollection: 'audit-plugin-logs',
-        pluginPrefix: 'audit-plugin',
-        updateDeltaVirtualField: 'audit-plugin-update-delta',
-      },
       userCollections: ['users'],
     })
   })
@@ -231,6 +230,44 @@ describe('plugin option helpers', () => {
   test('normalizes scalar and array user collections', () => {
     expect(normalizeUserCollections('users')).toEqual(['users'])
     expect(normalizeUserCollections(['users', 'other-users'])).toEqual(['users', 'other-users'])
+  })
+
+  test('supports custom collection and field names', () => {
+    const config = applyPlugin([{ slug: 'posts', fields: [] }], {
+      custom: {
+        auditLogCollectionSlug: 'content-audit-logs',
+        fieldNames: {
+          createdBy: 'createdByUser',
+          updateDelta: 'changeHistory',
+        },
+      },
+    })
+
+    expect(findCollection(config, 'content-audit-logs')?.slug).toBe('content-audit-logs')
+    expect(
+      findCollection(config, 'posts')?.fields.map((field) => 'name' in field && field.name),
+    ).toEqual(['createdByUser', 'changeHistory'])
+  })
+
+  test('rejects invalid custom collection and field names', () => {
+    expect(() =>
+      preparePluginConfig({
+        ...basePluginConfig,
+        custom: { auditLogCollectionSlug: 'Audit Logs' },
+      }),
+    ).toThrow('Invalid auditLogCollectionSlug')
+    expect(() =>
+      preparePluginConfig({
+        ...basePluginConfig,
+        custom: { fieldNames: { createdBy: 'created-by' } },
+      }),
+    ).toThrow('Invalid fieldNames.createdBy')
+    expect(() =>
+      preparePluginConfig({
+        ...basePluginConfig,
+        custom: { fieldNames: { updateDelta: 'update-delta' } },
+      }),
+    ).toThrow('Invalid fieldNames.updateDelta')
   })
 })
 
@@ -473,14 +510,14 @@ describe('audit log hooks', () => {
       expect(updateDelta?.admin?.condition?.({} as any, {} as any, {} as any)).toBe(false)
       expect(
         updateDelta?.admin?.condition?.(
-          { 'audit-plugin-update-delta': [] } as any,
+          { auditPluginUpdateDelta: [] } as any,
           {} as any,
           {} as any,
         ),
       ).toBe(false)
       expect(
         updateDelta?.admin?.condition?.(
-          { 'audit-plugin-update-delta': [{}] } as any,
+          { auditPluginUpdateDelta: [{}] } as any,
           {} as any,
           {} as any,
         ),

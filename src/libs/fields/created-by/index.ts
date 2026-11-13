@@ -2,7 +2,7 @@ import type { Field } from 'payload'
 import type { AuditPluginPayloadConfig } from 'src/config/types.js'
 
 const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field => ({
-  name: config.slugs.createdByVirtualField,
+  name: config.custom.fieldNames.createdBy,
   type: 'relationship',
   access: {
     create: () => false, // No create of virtual field allowed
@@ -31,7 +31,7 @@ const generateCreatedByVirtualField = (config: AuditPluginPayloadConfig): Field 
           return undefined
         }
         const { docs } = await req.payload.find({
-          collection: config.slugs.logsCollection,
+          collection: config.custom.auditLogCollectionSlug,
           depth: 0,
           limit: 1,
           pagination: false,

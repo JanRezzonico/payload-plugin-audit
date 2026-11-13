@@ -26,19 +26,11 @@ const preparePluginConfig = (
     config.logsCollectionHidden === undefined ? false : config.logsCollectionHidden
   const userCollections = normalizeUserCollections(config.userCollections)
 
-  const pluginPrefix = 'audit-plugin'
-
   return {
     ...config,
     custom,
     disabled: false,
     logsCollectionHidden,
-    slugs: {
-      createdByVirtualField: `${pluginPrefix}-created-by` as const,
-      logsCollection: `${pluginPrefix}-logs` as const,
-      pluginPrefix,
-      updateDeltaVirtualField: `${pluginPrefix}-update-delta` as const,
-    },
     userCollections,
   }
 }

@@ -5,8 +5,13 @@ import type { UserDescriptionLabels } from 'src/components/UserDescription.types
 type LabelOnly = { label: string }
 
 type ConfigCustom = {
+  auditLogCollectionSlug: string
   createdBy: LabelOnly
   deltaViewerLabels: DeltaViewerLabels
+  fieldNames: {
+    createdBy: string
+    updateDelta: string
+  }
   updateDelta: {
     date: { displayFormat: string; label: string }
     delta: LabelOnly
