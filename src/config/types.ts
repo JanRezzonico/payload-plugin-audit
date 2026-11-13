@@ -3,7 +3,7 @@ import type {
   ConfigCanSeeAudits,
   ConfigLogsCollectionHidden,
 } from './access/types.js'
-import type { EnabledCollections } from './collection-configs/types.js'
+import type { EnabledCollections } from './collections/types.js'
 import type { ConfigCustom, OptionalConfigCustom } from './custom/types.js'
 import type { IncomingUserCollections, UserCollections } from './user-collections/types.js'
 
