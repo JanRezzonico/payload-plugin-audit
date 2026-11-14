@@ -28,6 +28,16 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
       {
         name: 'entity',
         type: 'relationship',
+        admin: {
+          components: {
+            Description: {
+              clientProps: {
+                labels: config.ui.fields.entity.description,
+              },
+              path: 'audit-plugin-payload/client#PolymorphicDescription',
+            },
+          },
+        },
         index: true,
         relationTo: config.collections, // Polymorphic
         required: true,
@@ -45,7 +55,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
               clientProps: {
                 labels: config.ui.fields.user.description,
               },
-              path: 'audit-plugin-payload/client#UserDescription',
+              path: 'audit-plugin-payload/client#PolymorphicDescription',
             },
           },
         },

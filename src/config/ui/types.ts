@@ -21,6 +21,12 @@ type DeltaComponentColors = {
   }
 }
 
+type EntityDescriptionProps = {
+  beforeCollection: string
+  beforeId: string
+  separator: string
+}
+
 type ConfigUi = {
   fields: {
     createdBy: {
@@ -44,6 +50,9 @@ type ConfigUi = {
         }
       }
     }
+    entity: {
+      description: EntityDescriptionProps
+    }
     updateLogs: {
       date: {
         displayFormat: string
@@ -52,13 +61,9 @@ type ConfigUi = {
       label: string
     }
     user: {
-      description: {
-        beforeCollection: string
-        beforeUserId: string
-        separator: string
-      }
+      description: EntityDescriptionProps
       label: string
     }
   }
 }
-export type { ConfigUi, DeltaComponentColors }
+export type { ConfigUi, DeltaComponentColors, EntityDescriptionProps }

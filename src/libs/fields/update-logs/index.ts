@@ -40,7 +40,7 @@ const generateUpdateLogsVirtualField = (config: PluginConfig): Field => {
               clientProps: {
                 labels: config.ui.fields.user.description,
               },
-              path: 'audit-plugin-payload/client#UserDescription',
+              path: 'audit-plugin-payload/client#PolymorphicDescription',
             },
           },
         },

@@ -108,6 +108,13 @@ export default buildConfig({
               },
             },
           },
+          entity: {
+            description: {
+              beforeCollection: 'The entity is from the collection:                  ',
+              beforeId: 'The entity id is:                  ',
+              // separator: '<><><>',
+            },
+          },
           updateLogs: {
             date: {
               // displayFormat: 'HH:mm',
@@ -118,8 +125,8 @@ export default buildConfig({
           user: {
             description: {
               beforeCollection: 'The user is from the collection:                  ',
-              beforeUserId: 'The user id is:                  ',
-              separator: '---',
+              beforeId: 'The user id is:                  ',
+              // separator: '---',
             },
             label: 'This is the user we are talking about',
           },

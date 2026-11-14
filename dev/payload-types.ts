@@ -183,7 +183,7 @@ export interface Post {
     | number
     | boolean
     | null;
-  auditPluginCreatedBy?:
+  myCustomCreatedBy?:
     | ({
         relationTo: 'users';
         value: number | User;
@@ -192,7 +192,7 @@ export interface Post {
         relationTo: 'other-users';
         value: number | OtherUser;
       } | null);
-  auditPluginUpdateLogs?:
+  myCustomUpdateLogs?:
     | {
         user?:
           | ({
@@ -280,7 +280,7 @@ export interface OtherUser {
 export interface Media {
   id: number;
   alt?: string | null;
-  auditPluginCreatedBy?:
+  myCustomCreatedBy?:
     | ({
         relationTo: 'users';
         value: number | User;
@@ -289,7 +289,7 @@ export interface Media {
         relationTo: 'other-users';
         value: number | OtherUser;
       } | null);
-  auditPluginUpdateLogs?:
+  myCustomUpdateLogs?:
     | {
         user?:
           | ({
@@ -468,8 +468,8 @@ export interface PostsSelect<T extends boolean = true> {
   author?: T;
   media?: T;
   someJson?: T;
-  auditPluginCreatedBy?: T;
-  auditPluginUpdateLogs?:
+  myCustomCreatedBy?: T;
+  myCustomUpdateLogs?:
     | T
     | {
         user?: T;
@@ -486,8 +486,8 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  auditPluginCreatedBy?: T;
-  auditPluginUpdateLogs?:
+  myCustomCreatedBy?: T;
+  myCustomUpdateLogs?:
     | T
     | {
         user?: T;

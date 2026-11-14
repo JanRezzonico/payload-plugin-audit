@@ -44,6 +44,13 @@ const uiDefaults: ConfigUi = {
         },
       },
     },
+    entity: {
+      description: {
+        beforeCollection: 'Collection:',
+        beforeId: 'Entity id:',
+        separator: '|',
+      },
+    },
     updateLogs: {
       date: {
         displayFormat: 'dd/MM/yyyy HH:mm:ss',
@@ -54,7 +61,7 @@ const uiDefaults: ConfigUi = {
     user: {
       description: {
         beforeCollection: 'Collection:',
-        beforeUserId: 'User id:',
+        beforeId: 'User id:',
         separator: '|',
       },
       label: 'User',

@@ -14,8 +14,12 @@ const validateUi = (incomingConfig: IncomingPluginConfig['ui']): PluginConfig['u
   merged.fields.user.description.beforeCollection =
     merged.fields.user.description.beforeCollection.trim() + ' '
 
-  merged.fields.user.description.beforeUserId =
-    merged.fields.user.description.beforeUserId.trim() + ' '
+  merged.fields.user.description.beforeId = merged.fields.user.description.beforeId.trim() + ' '
+
+  merged.fields.entity.description.beforeCollection =
+    merged.fields.entity.description.beforeCollection.trim() + ' '
+
+  merged.fields.entity.description.beforeId = merged.fields.entity.description.beforeId.trim() + ' '
 
   const hasInvalidColor = Object.values(merged.fields.delta.component.colors).some((group) =>
     Object.values(group).some((value) => !isHexColor(value)),
