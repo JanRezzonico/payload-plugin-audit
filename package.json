@@ -1,11 +1,8 @@
 {
   "name": "audit-plugin-payload",
   "version": "0.0.1",
+  "private": true,
   "description": "",
-  "homepage": "https://github.com/JanRezzonico/audit-plugin-payload",
-  "bugs": {
-    "url": "https://github.com/JanRezzonico/audit-plugin-payload/issues"
-  },
   "keywords": [
     "payloadcms",
     "audit",
@@ -14,14 +11,17 @@
     "payload-plugin",
     "payload-plugin-audit"
   ],
-  "author": "Jan Rezzonico <jan@rezzonico.dev> (https://rezzonico.dev)",
-  "funding": "https://rezzonico.dev/contact",
+  "homepage": "https://github.com/JanRezzonico/audit-plugin-payload",
+  "bugs": {
+    "url": "https://github.com/JanRezzonico/audit-plugin-payload/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JanRezzonico/audit-plugin-payload.git"
   },
+  "funding": "https://rezzonico.dev/contact",
   "license": "UNLICENSED",
-  "private": true,
+  "author": "Jan Rezzonico <jan@rezzonico.dev> (https://rezzonico.dev)",
   "type": "module",
   "exports": {
     ".": {
@@ -50,15 +50,18 @@
     "dev:generate-importmap": "pnpm dev:payload generate:importmap",
     "dev:generate-types": "pnpm dev:payload generate:types",
     "dev:payload": "cross-env PAYLOAD_CONFIG_PATH=./dev/payload.config.ts payload",
+    "docker:reload": "docker compose down -v && docker compose up -d",
+    "generate": "pnpm generate:importmap && pnpm generate:types",
     "generate:importmap": "pnpm dev:generate-importmap",
     "generate:types": "pnpm dev:generate-types",
-    "generate": "pnpm generate:importmap && pnpm generate:types",
-    "docker:reload": "docker compose down -v && docker compose up -d",
     "lint": "eslint",
     "lint:fix": "eslint ./src --fix",
     "test": "pnpm test:int",
     "test:e2e": "playwright test",
     "test:int": "vitest"
+  },
+  "dependencies": {
+    "jsondiffpatch": "0.7.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
@@ -115,8 +118,5 @@
     },
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts"
-  },
-  "dependencies": {
-    "jsondiffpatch": "0.7.7"
   }
 }
