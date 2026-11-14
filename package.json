@@ -2,6 +2,24 @@
   "name": "audit-plugin-payload",
   "version": "0.0.1",
   "description": "",
+  "homepage": "https://github.com/JanRezzonico/audit-plugin-payload",
+  "bugs": {
+    "url": "https://github.com/JanRezzonico/audit-plugin-payload/issues"
+  },
+  "keywords": [
+    "payloadcms",
+    "audit",
+    "plugin",
+    "payload",
+    "payload-plugin",
+    "payload-plugin-audit"
+  ],
+  "author": "Jan Rezzonico <jan@rezzonico.dev> (https://rezzonico.dev)",
+  "funding": "https://rezzonico.dev/contact",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JanRezzonico/audit-plugin-payload.git"
+  },
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -75,6 +93,10 @@
     "payload": "^3.93.0"
   },
   "engines": {
+    "node": ">=26.0.0",
+    "pnpm": "^12"
+  },
+  "devEngines": {
     "node": ">=26.0.0",
     "pnpm": "^12"
   },
