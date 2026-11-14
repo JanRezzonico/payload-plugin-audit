@@ -1,10 +1,9 @@
 import type { Field } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/types.js'
+import type { PluginConfig } from 'src/config/types.js'
 
-const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Field => {
-  const ui = config.custom.updateDelta
+const generateUpdateLogsVirtualField = (config: PluginConfig): Field => {
   return {
-    name: config.custom.fieldNames.updateDelta,
+    name: config.db.fields.updateLogs.name,
     type: 'array',
     access: {
       create: () => false, // No create of virtual field allowed
@@ -17,13 +16,13 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
       components: {
         RowLabel: {
           clientProps: {
-            labels: ui.rowLabels,
+            labels: config.ui.fields.delta.rows.labels,
           },
           path: 'audit-plugin-payload/client#UpdateDeltaRowLabel',
         },
       },
       condition: (data) => {
-        const rows = data?.[config.custom.fieldNames.updateDelta]
+        const rows = data?.[config.db.fields.updateLogs.name]
         return Array.isArray(rows) && rows.length > 0
       },
       initCollapsed: true,
@@ -39,13 +38,13 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
           components: {
             Description: {
               clientProps: {
-                labels: config.custom.userDescriptionLabels,
+                labels: config.ui.fields.user.description,
               },
               path: 'audit-plugin-payload/client#UserDescription',
             },
           },
         },
-        label: ui.user.label,
+        label: config.ui.fields.user.label,
         relationTo: config.userCollections,
         required: false,
       },
@@ -54,10 +53,10 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
         type: 'date',
         admin: {
           date: {
-            displayFormat: ui.date.displayFormat,
+            displayFormat: config.ui.fields.updateLogs.date.displayFormat,
           },
         },
-        label: ui.date.label,
+        label: config.ui.fields.updateLogs.date.label,
         required: false,
       },
       {
@@ -67,13 +66,12 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
           components: {
             Field: {
               clientProps: {
-                labels: config.custom.deltaViewerLabels,
+                labels: config.ui.fields.delta.component.badgeLabels,
               },
               path: 'audit-plugin-payload/client#DeltaViewer',
             },
           },
         },
-        label: ui.delta.label,
         required: false,
       },
     ],
@@ -84,7 +82,7 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
             return undefined
           }
           const { docs } = await req.payload.find({
-            collection: config.custom.auditLogCollectionSlug,
+            collection: config.db.collections.logs.slug,
             depth: 0,
             pagination: false,
             req,
@@ -106,14 +104,10 @@ const generateUpdateDeltaVirtualField = (config: AuditPluginPayloadConfig): Fiel
         },
       ],
     },
-    label: ui.label,
-    labels: {
-      plural: ui.labels.plural,
-      singular: ui.labels.singular,
-    },
+    label: config.ui.fields.updateLogs.label,
     required: false,
     virtual: true,
   }
 }
 
-export { generateUpdateDeltaVirtualField }
+export { generateUpdateLogsVirtualField }

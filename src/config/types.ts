@@ -1,62 +1,38 @@
-import type { AccessManage, AccessRead, ConfigLogsCollectionHidden } from './access/types.js'
-import type { EnabledCollections } from './collections/types.js'
-import type { ConfigCustom, OptionalConfigCustom } from './custom/types.js'
-import type { IncomingUserCollections, UserCollections } from './user-collections/types.js'
+import type { ConfigAccess } from './access/types.js'
+import type { ConfigCollections } from './collections/types.js'
+import type { ConfigDb } from './db/types.js'
+import type { ConfigDisabled } from './disabled/types.js'
+import type { ConfigUi } from './ui/types.js'
+import type { ConfigUserCollections } from './user-collections/types.js'
 
-type IncomingAuditPluginPayloadConfig = {
-  /**
-   * Payload access control functions.
-   * Controls access to manage and view audit logs and the corresponding audit fields.
-   */
-  access: {
-    /**
-     * Payload access control function.
-     * Controls access to manage audit logs and the corresponding audit fields.
-     */
-    manage: AccessManage
-    /**
-     * Payload access control function.
-     * Controls access to view audit logs and the corresponding audit fields.
-     */
-    read: AccessRead
-  }
+type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }
 
-  /**
-   * Collections that should receive audit logging.
-   */
-  collections: EnabledCollections
+type PluginConfig = {
+  access: ConfigAccess
 
-  /**
-   * Customizes labels and date formatting for fields added by the plugin.
-   */
-  custom?: OptionalConfigCustom
+  collections: ConfigCollections
 
-  /**
-   * Disables the plugin when set to true.
-   *
-   * @default false
-   */
-  disabled?: boolean
+  db: ConfigDb
 
-  /**
-   * Hides the audit logs collection from the Payload admin panel when true.
-   *
-   * @default false
-   * Anyone allowed by `access.read` can also see the collection in the admin panel.
-   */
-  logsCollectionHidden?: ConfigLogsCollectionHidden
+  disabled: ConfigDisabled
 
-  /**
-   * The collection slugs used for users associated with audit records.
-   */
-  userCollections: IncomingUserCollections
+  ui: ConfigUi
+
+  userCollections: ConfigUserCollections
 }
 
-type AuditPluginPayloadConfig = {
-  custom: ConfigCustom
-  disabled: false
-  logsCollectionHidden: ConfigLogsCollectionHidden
-  userCollections: UserCollections
-} & IncomingAuditPluginPayloadConfig
+type IncomingPluginConfig = {
+  access: ConfigAccess
 
-export type { AuditPluginPayloadConfig, IncomingAuditPluginPayloadConfig }
+  collections: ConfigCollections
+
+  db?: DeepPartial<ConfigDb>
+
+  disabled?: DeepPartial<ConfigDisabled>
+
+  ui?: DeepPartial<ConfigUi>
+
+  userCollections: ConfigUserCollections
+}
+
+export type { DeepPartial, IncomingPluginConfig, PluginConfig }

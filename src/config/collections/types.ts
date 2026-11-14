@@ -1,5 +1,5 @@
 import type { CollectionSlug } from 'payload'
 
-type EnabledCollections = Array<CollectionSlug>
+type ConfigCollections = Array<CollectionSlug>
 
-export type { EnabledCollections }
+export type { ConfigCollections }

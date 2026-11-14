@@ -1,7 +1,7 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/types.js'
+import type { PluginConfig } from 'src/config/types.js'
 
-const generateCreatedByHook = (config: AuditPluginPayloadConfig): CollectionAfterChangeHook => {
+const generateCreatedByHook = (config: PluginConfig): CollectionAfterChangeHook => {
   return async ({ collection, context, doc, operation, req }) => {
     // Skip non-create ops
     if (operation !== 'create') {
@@ -15,7 +15,7 @@ const generateCreatedByHook = (config: AuditPluginPayloadConfig): CollectionAfte
       return
     }
     await req.payload.create({
-      collection: config.custom.auditLogCollectionSlug,
+      collection: config.db.collections.logs.slug,
       context,
       data: {
         delta: null, // No delta for create operations

@@ -7,13 +7,6 @@ export type DeltaViewerKindLabel = {
   variant: DeltaViewerChipVariant
 }
 
-export const defaultDeltaViewerLabels: DeltaViewerLabels = {
-  added: 'Added',
-  moved: 'Moved',
-  removed: 'Removed',
-  updated: 'Updated',
-}
-
 export type DeltaViewerKindLabels = Record<DeltaViewerOpKind, DeltaViewerKindLabel>
 
 export type DeltaViewerChipVariant = 'neutral' | 'new' | 'old' | 'update'

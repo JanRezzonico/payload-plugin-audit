@@ -1,47 +1,38 @@
 'use client'
 
+import type { PluginConfig } from 'src/config/types.js'
+
 import { useConfig, useFormFields } from '@payloadcms/ui'
-import { formatAdminURL } from 'payload/shared'
 
-import type { UserDescriptionLabels } from './UserDescription.types.js'
+import { unknownToData } from './UserDescription.utils.js'
 
-const UserDescription = ({ labels, path }: { labels: UserDescriptionLabels; path: string }) => {
+const UserDescription = ({
+  labels,
+  path,
+}: {
+  labels: PluginConfig['ui']['fields']['user']['description']
+  path: string
+}) => {
   const { config } = useConfig()
   const value = useFormFields(([fields]) => fields[path]?.value)
-  const isObject = value && typeof value === 'object' && !Array.isArray(value)
-  if (!isObject) {
+  const data = unknownToData(value, config)
+  if (!data) {
     return null
   }
-  const isRelationToAvailable = 'relationTo' in value && typeof value.relationTo === 'string'
-  const isValueAvailable = 'value' in value && ['number', 'string'].includes(typeof value.value)
-  if (!isRelationToAvailable || !isValueAvailable) {
-    return null
-  }
-
-  const collectionSlug = value.relationTo as string
-  const userId = value.value as string
-  const collectionHref = formatAdminURL({
-    adminRoute: config.routes.admin,
-    path: `/collections/${collectionSlug}`,
-  })
-  const userHref = formatAdminURL({
-    adminRoute: config.routes.admin,
-    path: `/collections/${collectionSlug}/${userId}`,
-  })
   return (
     <div className="field-description">
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <div>
-          <span>{`${labels.userIdPrefix.trim()} `}</span>
-          <a href={userHref} rel="noopener noreferrer">
-            {userId}
+          <span>{labels.beforeUserId}</span>
+          <a href={data.userHref} rel="noopener noreferrer">
+            {data.userId}
           </a>
         </div>
-        <span>|</span>
+        <span>{labels.separator}</span>
         <div>
-          <span>{`${labels.collectionSlugPrefix.trim()} `}</span>
-          <a href={collectionHref} rel="noopener noreferrer">
-            {collectionSlug}
+          <span>{labels.beforeCollection}</span>
+          <a href={data.collectionHref} rel="noopener noreferrer">
+            {data.collectionSlug}
           </a>
         </div>
       </div>

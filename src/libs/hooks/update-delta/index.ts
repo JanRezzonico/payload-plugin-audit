@@ -1,9 +1,9 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/types.js'
+import type { PluginConfig } from 'src/config/types.js'
 
 import * as jsondiffpatch from 'jsondiffpatch'
 
-const generateUpdateDeltaHook = (config: AuditPluginPayloadConfig): CollectionAfterChangeHook => {
+const generateUpdateDeltaHook = (config: PluginConfig): CollectionAfterChangeHook => {
   return async ({ collection, context, doc, operation, previousDoc, req }) => {
     // Skip non-update ops
     if (operation !== 'update') {
@@ -29,7 +29,7 @@ const generateUpdateDeltaHook = (config: AuditPluginPayloadConfig): CollectionAf
     const delta = jsondiffpatch.diff(original, nextData)
 
     await req.payload.create({
-      collection: config.custom.auditLogCollectionSlug,
+      collection: config.db.collections.logs.slug,
       context,
       data: {
         delta,

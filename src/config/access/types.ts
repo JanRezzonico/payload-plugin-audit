@@ -1,7 +1,11 @@
-import type { Access, CollectionConfig, FieldAccess } from 'payload'
+import type { Access, FieldAccess } from 'payload'
 
 type AccessRead = Access & FieldAccess
 type AccessManage = Access & FieldAccess
-type ConfigLogsCollectionHidden = NonNullable<CollectionConfig['admin']>['hidden']
 
-export type { AccessManage, AccessRead, ConfigLogsCollectionHidden }
+type ConfigAccess = {
+  manage: AccessManage
+  read: AccessRead
+}
+
+export type { AccessManage, AccessRead, ConfigAccess }

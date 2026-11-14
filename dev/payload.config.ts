@@ -36,36 +36,72 @@ export default buildConfig({
   plugins: [
     auditPluginPayload({
       access: {
-        manage: ({ req }) => req.user?.role === 'admin',
-        read: ({ req }) => ['admin', 'viewer'].includes(req.user?.role || ''),
+        manage: ({ req }) => {
+          return req.user?.collection === 'users' && req.user.role === 'admin'
+        },
+        read: ({ req }) => {
+          return (
+            req.user?.collection === 'users' && ['admin', 'viewer'].includes(req.user.role || '')
+          )
+        },
       },
-      collections: ['media', 'posts'],
-      custom: {
-        auditLogCollectionSlug: 'my-custom-audit-logs',
-        deltaViewerLabels: {
-          added: 'My Custom Added',
-          moved: 'My Custom Moved',
-          // removed: 'My Custom Removed',
-          updated: 'My Custom Updated',
-        },
-        fieldNames: {
-          createdBy: 'myCustomCreatedBy',
-          updateDelta: 'myCustomUpdateDelta',
-        },
-        updateDelta: {
-          rowLabels: {
-            changeNumber: 'My Custom Change ({number}), yes its {number}',
-            genericChange: 'My Custom Change',
-            latestChange: 'My Custom Latest Change ({number})',
+      collections: ['posts', 'media'],
+      db: {
+        collections: {
+          logs: {
+            // slug: 'the-audit-logs',
+            // hidden: true,
           },
         },
-        userDescriptionLabels: {
-          collectionSlugPrefix: 'The user is from the collection:',
-          userIdPrefix: 'The user has the id:',
+        fields: {
+          createdBy: {
+            name: 'myCustomCreatedBy',
+          },
+          updateLogs: {
+            name: 'myCustomUpdateLogs',
+          },
         },
       },
       disabled: false,
-      logsCollectionHidden: false,
+      ui: {
+        fields: {
+          createdBy: {
+            label: 'This entity was created by',
+          },
+          delta: {
+            component: {
+              badgeLabels: {
+                added: 'Addition',
+                moved: 'Move',
+                removed: 'Removal',
+                updated: 'Update',
+              },
+            },
+            rows: {
+              labels: {
+                change: 'My custom change number {number}',
+                fallback: 'My custom fallback',
+                latestChange: 'My custom latest change',
+              },
+            },
+          },
+          updateLogs: {
+            date: {
+              // displayFormat: 'HH:mm',
+              label: 'My custom date label',
+            },
+            label: 'This is the update log',
+          },
+          user: {
+            description: {
+              beforeCollection: 'The user is from the collection:                  ',
+              beforeUserId: 'The user id is:                  ',
+              separator: '---',
+            },
+            label: 'This is the user we are talking about',
+          },
+        },
+      },
       userCollections: ['users', 'other-users'],
     }),
   ],

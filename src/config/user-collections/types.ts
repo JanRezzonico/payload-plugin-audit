@@ -1,7 +1,5 @@
 import type { CollectionSlug } from 'payload'
 
-type IncomingUserCollections = CollectionSlug | CollectionSlug[]
+type ConfigUserCollections = CollectionSlug[]
 
-type UserCollections = CollectionSlug[]
-
-export type { IncomingUserCollections, UserCollections }
+export type { ConfigUserCollections }

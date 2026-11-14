@@ -1,21 +1,22 @@
 import type { Config } from 'payload'
 
-import type { IncomingAuditPluginPayloadConfig } from './config/types.js'
+import type { IncomingPluginConfig } from './config/types.js'
 
-import { isPluginEnabled, preparePluginConfig } from './config/index.js'
+import { isPluginEnabled, mergeConfig } from './config/index.js'
 import { generateLogsCollection } from './libs/collections/logs/index.js'
 import { generateCreatedByVirtualField } from './libs/fields/created-by/index.js'
-import { generateUpdateDeltaVirtualField } from './libs/fields/update-delta/index.js'
+import { generateUpdateLogsVirtualField } from './libs/fields/update-logs/index.js'
 import { generateCreatedByHook } from './libs/hooks/created-by/index.js'
 import { generateUpdateDeltaHook } from './libs/hooks/update-delta/index.js'
 
 export const auditPluginPayload =
-  (incomingPluginConfig: IncomingAuditPluginPayloadConfig) =>
+  (incomingPluginConfig: IncomingPluginConfig) =>
   (config: Config): Config => {
     if (!isPluginEnabled(incomingPluginConfig)) {
       return config
     }
-    const pluginConfig = preparePluginConfig(incomingPluginConfig)
+
+    const pluginConfig = mergeConfig(incomingPluginConfig)
 
     const createdByHook = generateCreatedByHook(pluginConfig)
     const updateDeltaHook = generateUpdateDeltaHook(pluginConfig)
@@ -23,13 +24,13 @@ export const auditPluginPayload =
     const logsCollection = generateLogsCollection(pluginConfig)
 
     const createdByVirtualField = generateCreatedByVirtualField(pluginConfig)
-    const updateDeltaVirtualField = generateUpdateDeltaVirtualField(pluginConfig)
+    const updateLogsVirtualField = generateUpdateLogsVirtualField(pluginConfig)
 
     config.collections = config.collections ?? []
     config.collections.push(logsCollection)
 
     config.collections.forEach((collection) => {
-      if (collection.slug === pluginConfig.custom.auditLogCollectionSlug) {
+      if (collection.slug === pluginConfig.db.collections.logs.slug) {
         return // Probably not needed, but just in case, we don't want to add hooks to the logs collection itself
       }
       if (!pluginConfig.collections.includes(collection.slug)) {
@@ -44,7 +45,7 @@ export const auditPluginPayload =
       ]
 
       collection.fields = collection.fields ?? []
-      collection.fields = [...collection.fields, createdByVirtualField, updateDeltaVirtualField]
+      collection.fields = [...collection.fields, createdByVirtualField, updateLogsVirtualField]
     })
 
     return config

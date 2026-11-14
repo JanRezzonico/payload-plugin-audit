@@ -1,9 +1,9 @@
 import type { CollectionConfig } from 'payload'
-import type { AuditPluginPayloadConfig } from 'src/config/types.js'
+import type { PluginConfig } from 'src/config/types.js'
 
-const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionConfig => {
+const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
   return {
-    slug: config.custom.auditLogCollectionSlug,
+    slug: config.db.collections.logs.slug,
     access: {
       create: config.access.manage,
       delete: config.access.manage,
@@ -12,12 +12,16 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
     },
     admin: {
       defaultColumns: ['operation', 'entity', 'userId', 'createdAt'],
-      hidden: config.logsCollectionHidden,
+      hidden: config.db.collections.logs.hidden,
     },
     fields: [
       {
         name: 'operation',
         type: 'select',
+        access: {
+          // Operation type should never be changed as it could break things
+          update: () => false,
+        },
         options: ['create', 'update'],
         required: true,
       },
@@ -25,13 +29,13 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
         name: 'entity',
         type: 'relationship',
         index: true,
-        // Polymorphic relationship to all enabled collections
-        relationTo: config.collections,
+        relationTo: config.collections, // Polymorphic
         required: true,
       },
       {
         name: 'userId',
         type: 'relationship',
+        label: config.ui.fields.user.label,
         relationTo: config.userCollections,
         required: true,
 
@@ -39,7 +43,7 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
           components: {
             Description: {
               clientProps: {
-                labels: config.custom.userDescriptionLabels,
+                labels: config.ui.fields.user.description,
               },
               path: 'audit-plugin-payload/client#UserDescription',
             },
@@ -49,15 +53,20 @@ const generateLogsCollection = (config: AuditPluginPayloadConfig): CollectionCon
       {
         name: 'delta',
         type: 'json',
+        access: {
+          // Block delta updates done via API (ui access is already restricted by custom Field and readOnly: true)
+          update: () => false,
+        },
         admin: {
           components: {
             Field: {
               clientProps: {
-                labels: config.custom.deltaViewerLabels,
+                labels: config.ui.fields.delta.component.badgeLabels,
               },
               path: 'audit-plugin-payload/client#DeltaViewer',
             },
           },
+          readOnly: true,
         },
         required: false, // No delta for create operations
       },
