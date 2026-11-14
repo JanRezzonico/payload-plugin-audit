@@ -5,7 +5,7 @@ import type { IncomingPluginConfig, PluginConfig } from '../types.js'
 import { uiDefaults } from './defaults.js'
 
 /**
- * @throws Error if the config is not valid
+ * @throws `AuditPluginValidationError` if the config is not valid
  */
 const validateUi = (incomingConfig: IncomingPluginConfig['ui']): PluginConfig['ui'] => {
   const merged: PluginConfig['ui'] = deepMergeWithSourceArrays(uiDefaults, incomingConfig ?? {})

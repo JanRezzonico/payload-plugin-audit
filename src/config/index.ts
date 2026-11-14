@@ -1,3 +1,5 @@
+import { AuditPluginValidationError } from 'src/utils/AuditPluginValidationError.js'
+
 import type { IncomingPluginConfig, PluginConfig } from './types.js'
 
 import { validateAccess } from './access/validate.js'
@@ -12,11 +14,13 @@ const isPluginEnabled = (config: IncomingPluginConfig): boolean => {
 }
 
 /**
- * @throws Error if the incoming config is invalid or if the plugin is disabled
+ * Merges the incoming plugin config with the default values.
+ *
+ * @throws `AuditPluginValidationError` if the incoming config is invalid or if the plugin is disabled
  */
 const mergeConfig = (incomingConfig: IncomingPluginConfig): PluginConfig => {
   if (!isPluginEnabled(incomingConfig)) {
-    throw new Error('Audit plugin is disabled')
+    throw new AuditPluginValidationError('Audit plugin is disabled but the config is being merged')
   }
   const access = validateAccess(incomingConfig.access)
   const collections = validateCollections(incomingConfig.collections)

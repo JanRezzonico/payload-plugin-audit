@@ -1,3 +1,6 @@
+/**
+ * Various UI configuration options for the audit plugin.
+ */
 type ConfigUi = {
   fields: {
     createdBy: {

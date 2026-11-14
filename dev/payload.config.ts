@@ -39,6 +39,7 @@ export default buildConfig({
         manage: ({ req }) => {
           return req.user?.collection === 'users' && req.user.role === 'admin'
         },
+        // manage: ({ req }) => { return false },
         read: ({ req }) => {
           return (
             req.user?.collection === 'users' && ['admin', 'viewer'].includes(req.user.role || '')

@@ -6,7 +6,6 @@ import type { IncomingPluginConfig, PluginConfig } from '../types.js'
 import { dbDefaults } from './defaults.js'
 
 /**
- * Validates the database configuration.
  * @throws `AuditPluginValidationError` if the config is not valid
  */
 const validateDb = (incomingConfig: IncomingPluginConfig['db']): PluginConfig['db'] => {
