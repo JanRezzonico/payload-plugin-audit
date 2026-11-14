@@ -113,7 +113,9 @@ Changing collection slug or field names changes the database schema and generate
 `access.read` controls who can read audit logs and the generated virtual fields.
 
 `access.delete` controls manual delete access on the audit-log collection.
+
 Keep `access.delete` restrictive as users with it can remove parts of the audit trail.
+
 It is recommended to set `access.delete` to `false` and rely solely on the plugin's automatic logging.
 
 ### Admin UI
