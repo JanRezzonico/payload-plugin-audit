@@ -23,7 +23,9 @@ const validateUi = (incomingConfig: IncomingPluginConfig['ui']): PluginConfig['u
 
   if (hasInvalidColor) {
     throw new AuditPluginValidationError(
-      'Invalid color value in config.ui.fields.delta.component.colors. All colors must be valid hex color strings. (Example: #ff0000 or #f00 case-insensitive)',
+      `Invalid color value in custom UI configuration.
+      All colors must be valid hex color strings (case insensitive).
+      (Example: #ff0000 or #f00)`,
     )
   }
 

@@ -77,28 +77,28 @@ export default buildConfig({
                 removed: 'Removal',
                 updated: 'Update',
               },
-              // colors: {
-              // neutral: {
-              //   background: '#0000fd',
-              //   border: '#0f0',
-              //   foreground: '#f00',
-              // },
-              // new: {
-              //   background: '#0000fd',
-              //   border: '#0f0',
-              //   foreground: '#f00',
-              // },
-              // old: {
-              //   background: '#0000fd',
-              //   border: '#0f0',
-              //   foreground: '#f00',
-              // },
-              // updated: {
-              //   background: '#0000fd',
-              //   border: '#0f0',
-              //   foreground: '#f00',
-              // },
-              // },
+              colors: {
+                // neutral: {
+                //   background: '#0000fd',
+                //   border: '#0f0',
+                //   foreground: '#f00',
+                // },
+                // new: {
+                //   background: 'pink',
+                //   border: 'red',
+                //   foreground: 'yellow',
+                // },
+                // old: {
+                //   background: '#0000fd',
+                //   border: '#0f0',
+                //   foreground: '#f00',
+                // },
+                // updated: {
+                //   background: '#0000fd',
+                //   border: '#0f0',
+                //   foreground: '#f00',
+                // },
+              },
             },
             rows: {
               labels: {
