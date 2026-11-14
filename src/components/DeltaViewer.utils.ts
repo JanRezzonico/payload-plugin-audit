@@ -1,5 +1,7 @@
 import type { Delta } from 'jsondiffpatch'
 import type { Op } from 'jsondiffpatch/formatters/jsonpatch'
+import type { CSSProperties } from 'react'
+import type { DeltaComponentColors } from 'src/config/ui/types.js'
 
 import type { DeltaViewerOpKind } from './DeltaViewer.types.js'
 
@@ -71,4 +73,19 @@ export function classifyOp(op: Op, oldValue: unknown): DeltaViewerOpKind {
     default:
       return 'updated'
   }
+}
+
+export function colorsToCSSVars(colors: DeltaComponentColors): CSSProperties {
+  const vars: Record<string, string> = {}
+  const prefix = '--delta-viewer'
+
+  Object.entries(colors).forEach(([groupName, group]) => {
+    const groupPrefix = `${prefix}-${groupName}`
+    Object.entries(group).forEach(([itemName, value]) => {
+      const name = `${groupPrefix}-${itemName}`
+      vars[name] = value
+    })
+  })
+
+  return vars as CSSProperties
 }

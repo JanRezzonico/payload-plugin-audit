@@ -3,12 +3,14 @@
 import type { Delta } from 'jsondiffpatch'
 import type { Op } from 'jsondiffpatch/formatters/jsonpatch'
 import type { ReactNode } from 'react'
+import type { DeltaComponentColors } from 'src/config/ui/types.js'
 
 import { useField } from '@payloadcms/ui'
 import * as jsonpatchFormatter from 'jsondiffpatch/formatters/jsonpatch'
-import { useMemo } from 'react'
 
 import './DeltaViewer.css'
+
+import { useMemo } from 'react'
 
 import type {
   DeltaViewerChipVariant,
@@ -17,7 +19,13 @@ import type {
   DeltaViewerOpKind,
 } from './DeltaViewer.types.js'
 
-import { classifyOp, formatPath, formatValue, getOldValue } from './DeltaViewer.utils.js'
+import {
+  classifyOp,
+  colorsToCSSVars,
+  formatPath,
+  formatValue,
+  getOldValue,
+} from './DeltaViewer.utils.js'
 
 function Chip({ children, variant }: { children: ReactNode; variant: DeltaViewerChipVariant }) {
   return (
@@ -112,11 +120,12 @@ function Message({ children, value }: { children: ReactNode; value: unknown }) {
 }
 
 type Props = {
+  colors: DeltaComponentColors
   labels: DeltaViewerLabels
   path: string
 }
 
-function DeltaViewer({ labels, path }: Props) {
+function DeltaViewer({ colors, labels, path }: Props) {
   const { value } = useField<Delta>({ path })
   const kindLabels: DeltaViewerKindLabels = {
     added: { text: labels.added, variant: 'new' },
@@ -144,8 +153,10 @@ function DeltaViewer({ labels, path }: Props) {
     return <Message value={value}>No changes recorded</Message>
   }
 
+  const colorsStyle = colorsToCSSVars(colors)
+
   return (
-    <div className="DeltaViewer__container">
+    <div className="DeltaViewer__container" style={colorsStyle}>
       {result.ops.map((op) => (
         <OpRow delta={value} key={`${op.op}:${op.path}`} kindLabels={kindLabels} op={op} />
       ))}

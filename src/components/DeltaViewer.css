@@ -1,18 +1,3 @@
-:root {
-  --delta-viewer-old-bg: #fee2e2;
-  --delta-viewer-old-fg: #991b1b;
-  --delta-viewer-old-border: #ef4444;
-  --delta-viewer-new-bg: #dcfce7;
-  --delta-viewer-new-fg: #166534;
-  --delta-viewer-new-border: #22c55e;
-  --delta-viewer-update-bg: #ffedd5;
-  --delta-viewer-update-fg: #9a3412;
-  --delta-viewer-update-border: #f59e0b;
-  --delta-viewer-neutral-bg: #f0f0f0;
-  --delta-viewer-neutral-fg: #444;
-  --delta-viewer-neutral-border: #9ca3af;
-}
-
 .DeltaViewer__container {
   display: flex;
   flex-direction: column;
@@ -39,26 +24,26 @@
 
 .DeltaViewer__chip[data-variant='old'],
 .DeltaViewer__op-title-chip[data-variant='old'] {
-  background-color: var(--delta-viewer-old-bg);
-  color: var(--delta-viewer-old-fg);
+  background-color: var(--delta-viewer-old-background);
+  color: var(--delta-viewer-old-foreground);
 }
 
 .DeltaViewer__chip[data-variant='new'],
 .DeltaViewer__op-title-chip[data-variant='new'] {
-  background-color: var(--delta-viewer-new-bg);
-  color: var(--delta-viewer-new-fg);
+  background-color: var(--delta-viewer-new-background);
+  color: var(--delta-viewer-new-foreground);
 }
 
 .DeltaViewer__chip[data-variant='neutral'],
 .DeltaViewer__op-title-chip[data-variant='neutral'] {
-  background-color: var(--delta-viewer-neutral-bg);
-  color: var(--delta-viewer-neutral-fg);
+  background-color: var(--delta-viewer-neutral-background);
+  color: var(--delta-viewer-neutral-foreground);
 }
 
 .DeltaViewer__chip[data-variant='update'],
 .DeltaViewer__op-title-chip[data-variant='update'] {
-  background-color: var(--delta-viewer-update-bg);
-  color: var(--delta-viewer-update-fg);
+  background-color: var(--delta-viewer-updated-background);
+  color: var(--delta-viewer-updated-foreground);
 }
 
 .DeltaViewer__chip[data-variant='old'] {
@@ -92,7 +77,7 @@
 }
 
 .DeltaViewer__op[data-variant='update'] {
-  --op-border: var(--delta-viewer-update-border);
+  --op-border: var(--delta-viewer-updated-border);
 }
 
 .DeltaViewer__op-title-container {

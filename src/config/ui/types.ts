@@ -1,3 +1,26 @@
+type DeltaComponentColors = {
+  neutral: {
+    background: string
+    border: string
+    foreground: string
+  }
+  new: {
+    background: string
+    border: string
+    foreground: string
+  }
+  old: {
+    background: string
+    border: string
+    foreground: string
+  }
+  updated: {
+    background: string
+    border: string
+    foreground: string
+  }
+}
+
 type ConfigUi = {
   fields: {
     createdBy: {
@@ -11,6 +34,7 @@ type ConfigUi = {
           removed: string
           updated: string
         }
+        colors: DeltaComponentColors
       }
       rows: {
         labels: {
@@ -37,4 +61,4 @@ type ConfigUi = {
     }
   }
 }
-export type { ConfigUi }
+export type { ConfigUi, DeltaComponentColors }

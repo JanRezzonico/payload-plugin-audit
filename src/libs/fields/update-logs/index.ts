@@ -66,6 +66,7 @@ const generateUpdateLogsVirtualField = (config: PluginConfig): Field => {
           components: {
             Field: {
               clientProps: {
+                colors: config.ui.fields.delta.component.colors,
                 labels: config.ui.fields.delta.component.badgeLabels,
               },
               path: 'audit-plugin-payload/client#DeltaViewer',
