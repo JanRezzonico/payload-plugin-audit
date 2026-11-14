@@ -63,7 +63,7 @@ export default buildConfig({
           },
         },
       },
-      disabled: false,
+      state: 'enabled',
       ui: {
         fields: {
           createdBy: {

@@ -1,7 +1,7 @@
 import type { ConfigAccess } from './access/types.js'
 import type { ConfigCollections } from './collections/types.js'
 import type { ConfigDb } from './db/types.js'
-import type { ConfigDisabled } from './disabled/types.js'
+import type { ConfigState } from './state/types.js'
 import type { ConfigUi } from './ui/types.js'
 import type { ConfigUserCollections } from './user-collections/types.js'
 
@@ -14,7 +14,7 @@ type PluginConfig = {
 
   db: ConfigDb
 
-  disabled: ConfigDisabled
+  state: ConfigState
 
   ui: ConfigUi
 
@@ -51,13 +51,15 @@ type IncomingPluginConfig = {
   db?: DeepPartial<ConfigDb>
 
   /**
-   * Configuration for disabling the audit plugin.
+   * Controls the activation state of the audit plugin.
    *
-   * When set to true, the audit plugin will be disabled and no audit logs will be generated.
+   * - `enabled`: Normal behavior. The plugin functions as expected.
+   * - `disabled`: Disables hooks, collections and virtual fields. Transitioning from `enabled` to `disabled` requires a database migration and a type update to remove the audit plugin's data.
+   * - `inactive`: Disables hooks while keeping collections and virtual fields. No new audit logs will be generated.
    *
-   * @default false
+   * @default 'enabled'
    */
-  disabled?: DeepPartial<ConfigDisabled>
+  state?: DeepPartial<ConfigState>
 
   /**
    * Various UI configuration options to customize the look
