@@ -22,16 +22,59 @@ type PluginConfig = {
 }
 
 type IncomingPluginConfig = {
+  /**
+   * Payload access control configuration for the audit plugin.
+   */
   access: ConfigAccess
 
+  /**
+   * Payload configuration for the collections that should be audited.
+   *
+   * This is an array of collection slugs.
+   *
+   * Note: specifying an empty array will throw an error during the plugin initialization.
+   *
+   * The audit logs collection itself can never be audited and is automatically excluded from this configuration.
+   *
+   * @example ['posts', 'media']
+   */
   collections: ConfigCollections
 
+  /**
+   * Configuration for the collections and fields used by the audit plugin in the database.
+   *
+   * This configuration allows you to customize the names of the collections and fields used by the audit plugin.
+   *
+   * Note that modifying these fields could warrant a database migration, as these configurations are
+   * used to create the collections and fields in the database.
+   */
   db?: DeepPartial<ConfigDb>
 
+  /**
+   * Configuration for disabling the audit plugin.
+   *
+   * When set to true, the audit plugin will be disabled and no audit logs will be generated.
+   *
+   * @default false
+   */
   disabled?: DeepPartial<ConfigDisabled>
 
+  /**
+   * Various UI configuration options to customize the look
+   * of the audit plugin in the Payload admin panel.
+   */
   ui?: DeepPartial<ConfigUi>
 
+  /**
+   * List of collection slugs that are considered user collections.
+   *
+   * Include all collections that are auth-enabled and could interact
+   * with a collection that is being audited.
+   *
+   * Note: specifying an empty array will throw an error during the plugin initialization.
+   *
+   * @example ['users']
+   */
   userCollections: ConfigUserCollections
 }
 
