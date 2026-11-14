@@ -38,7 +38,7 @@ export default buildConfig({
 	plugins: [
 		auditPluginPayload({
 			access: {
-				manage: ({ req }) => false, // Disable manual logs management
+				delete: ({ req }) => false, // Disable manual logs deletion
 				read: ({ req }) => Boolean(req.user), // Only logged-in users can read logs
 			},
 			collections: ['posts'],
@@ -110,7 +110,11 @@ Changing collection slug or field names changes the database schema and generate
 
 ### Access control
 
-`access.read` controls who can read audit logs and the generated virtual fields. `access.manage` controls manual create, update, and delete access on the audit-log collection. Keep `manage` as restrictive as possible because users with it can alter the audit trail. It is recommended to set `manage` to `false` and rely solely on the plugin's automatic logging.
+`access.read` controls who can read audit logs and the generated virtual fields.
+
+`access.delete` controls manual delete access on the audit-log collection.
+Keep `access.delete` restrictive as users with it can remove parts of the audit trail.
+It is recommended to set `access.delete` to `false` and rely solely on the plugin's automatic logging.
 
 ### Admin UI
 

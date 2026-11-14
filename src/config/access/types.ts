@@ -2,22 +2,18 @@ import type { Access, FieldAccess } from 'payload'
 
 type AccessRead = Access & FieldAccess
 
-type AccessManage = Access & FieldAccess
+type AccessDelete = Access & FieldAccess
 
 type ConfigAccess = {
   /**
    * Payload access control function to determine which
-   * users can manually manage the audit logs.
+   * users can manually delete audit logs.
    *
-   * This includes creating, updating, and deleting audit logs.
-   *
-   * This access should be as restrictive as possible, or even set to
-   * deny everyone, as an user with this access can create, update, and delete audit logs,
-   * which can compromise the integrity of the audit trail.
+   * This access should be restrictive as users with it can remove parts of the audit trail.
    *
    * @example ({ req }) => { return false } // Deny everyone
    */
-  manage: AccessManage
+  delete: AccessDelete
 
   /**
    * Payload access control function to determine which
@@ -28,4 +24,4 @@ type ConfigAccess = {
   read: AccessRead
 }
 
-export type { AccessManage, AccessRead, ConfigAccess }
+export type { AccessDelete, AccessRead, ConfigAccess }

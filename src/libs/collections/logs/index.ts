@@ -5,10 +5,10 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
   return {
     slug: config.db.collections.logs.slug,
     access: {
-      create: config.access.manage,
-      delete: config.access.manage,
+      create: () => false,
+      delete: config.access.delete,
       read: config.access.read,
-      update: config.access.manage,
+      update: () => false,
     },
     admin: {
       defaultColumns: ['operation', 'entity', 'userId', 'createdAt'],
@@ -19,8 +19,11 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
         name: 'operation',
         type: 'select',
         access: {
-          // Operation type should never be changed as it could break things
+          create: () => false,
           update: () => false,
+        },
+        admin: {
+          readOnly: true,
         },
         options: ['create', 'update'],
         required: true,
@@ -28,6 +31,10 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
       {
         name: 'entity',
         type: 'relationship',
+        access: {
+          create: () => false,
+          update: () => false,
+        },
         admin: {
           components: {
             Description: {
@@ -37,6 +44,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
               path: 'audit-plugin-payload/client#PolymorphicDescription',
             },
           },
+          readOnly: true,
         },
         index: true,
         relationTo: config.collections, // Polymorphic
@@ -45,6 +53,10 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
       {
         name: 'userId',
         type: 'relationship',
+        access: {
+          create: () => false,
+          update: () => false,
+        },
         label: config.ui.fields.user.label,
         relationTo: config.userCollections,
         required: true,
@@ -58,13 +70,14 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
               path: 'audit-plugin-payload/client#PolymorphicDescription',
             },
           },
+          readOnly: true,
         },
       },
       {
         name: 'delta',
         type: 'json',
         access: {
-          // Block delta updates done via API (ui access is already restricted by custom Field and readOnly: true)
+          create: () => false,
           update: () => false,
         },
         admin: {
