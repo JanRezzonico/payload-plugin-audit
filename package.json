@@ -34,6 +34,7 @@
     "dev:payload": "cross-env PAYLOAD_CONFIG_PATH=./dev/payload.config.ts payload",
     "generate:importmap": "pnpm dev:generate-importmap",
     "generate:types": "pnpm dev:generate-types",
+    "generate": "pnpm generate:importmap && pnpm generate:types",
     "docker:reload": "docker compose down -v && docker compose up -d",
     "lint": "eslint",
     "lint:fix": "eslint ./src --fix",
@@ -88,11 +89,6 @@
         "import": "./dist/exports/client.js",
         "types": "./dist/exports/client.d.ts",
         "default": "./dist/exports/client.js"
-      },
-      "./rsc": {
-        "import": "./dist/exports/rsc.js",
-        "types": "./dist/exports/rsc.d.ts",
-        "default": "./dist/exports/rsc.js"
       }
     },
     "main": "./dist/index.js",
