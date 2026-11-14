@@ -11,7 +11,11 @@ import {
   formatValue,
   getOldValue,
 } from '../src/components/DeltaViewer.utils.js'
-import { unknownToData } from '../src/components/UserDescription.utils.js'
+import {
+  buildCollectionHref,
+  buildEntityHref,
+  formFieldValueToTypedObject,
+} from '../src/components/utils.js'
 import { validateDb } from '../src/config/db/validate.js'
 import { isPluginDisabled, mergeConfig } from '../src/config/index.js'
 import { validateUi } from '../src/config/ui/validate.js'
@@ -26,7 +30,7 @@ type Doc = Record<string, any>
 type HookArgs = Parameters<CollectionAfterChangeHook>[0]
 
 const access = {
-  manage: vi.fn(({ req }: any) => req.user?.role === 'admin'),
+  delete: vi.fn(({ req }: any) => req.user?.role === 'admin'),
   read: vi.fn(({ req }: any) => Boolean(req.user)),
 }
 
@@ -118,7 +122,7 @@ describe('plugin configuration', () => {
     expect(merged.ui.fields.createdBy.label).toBe('Author')
     expect(merged.ui.fields.user.description).toMatchObject({
       beforeCollection: 'Collection: ',
-      beforeUserId: 'User id: ',
+      beforeId: 'User id: ',
       separator: '/',
     })
     expect(() => mergeConfig({ ...baseConfig, state: 'disabled' } as any)).toThrow(
@@ -214,9 +218,9 @@ describe('plugin collection transform and log collection', () => {
       admin: { hidden: false },
       timestamps: true,
     })
-    expect(logs.access?.create?.({ req: { user: { role: 'admin' } } } as any)).toBe(true)
+    expect(logs.access?.create?.({ req: { user: { role: 'admin' } } } as any)).toBe(false)
     expect(logs.access?.read?.({ req: { user: null } } as any)).toBe(false)
-    expect(logs.access?.delete).toBe(access.manage)
+    expect(logs.access?.delete).toBe(access.delete)
     expect(logs.fields.map((field) => 'name' in field && field.name)).toEqual([
       'operation',
       'entity',
@@ -474,14 +478,14 @@ describe('client utility behavior', () => {
 
   test('converts valid relationship values to admin URLs and rejects invalid values', () => {
     const clientConfig = { routes: { admin: '/admin' } } as any
-    expect(unknownToData(null, clientConfig)).toBeNull()
-    expect(unknownToData({ relationTo: 'users' }, clientConfig)).toBeNull()
-    expect(unknownToData({ relationTo: 'users', value: 'user-1' }, clientConfig)).toEqual({
-      collectionHref: '/admin/collections/users',
-      collectionSlug: 'users',
-      userHref: '/admin/collections/users/user-1',
-      userId: 'user-1',
+    expect(formFieldValueToTypedObject(null)).toBeNull()
+    expect(formFieldValueToTypedObject({ relationTo: 'users' })).toBeNull()
+    expect(formFieldValueToTypedObject({ relationTo: 'users', value: 'user-1' })).toEqual({
+      id: 'user-1',
+      slug: 'users',
     })
+    expect(buildCollectionHref('users', clientConfig)).toBe('/admin/collections/users')
+    expect(buildEntityHref('users', 'user-1', clientConfig)).toBe('/admin/collections/users/user-1')
   })
 })
 
