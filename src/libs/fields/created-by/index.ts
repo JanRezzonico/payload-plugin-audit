@@ -45,7 +45,7 @@ const generateCreatedByVirtualField = (config: PluginConfig): Field => ({
             ],
           },
         })
-        return docs[0]?.userId
+        return docs[0]?.user
       },
     ],
   },

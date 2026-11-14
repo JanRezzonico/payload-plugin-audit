@@ -100,7 +100,7 @@ const generateUpdateLogsVirtualField = (config: PluginConfig): Field => {
             id: audit.id,
             date: audit.createdAt,
             delta: audit.delta,
-            user: audit.userId,
+            user: audit.user,
           }))
         },
       ],

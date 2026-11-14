@@ -35,7 +35,7 @@ const generateUpdateDeltaHook = (config: PluginConfig): CollectionAfterChangeHoo
         delta,
         entity: { relationTo: collection.slug, value: doc.id },
         operation: 'update',
-        userId: { relationTo: user.collection, value: user.id },
+        user: { relationTo: user.collection, value: user.id },
       },
       overrideAccess: true,
       req,

@@ -11,7 +11,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
       update: () => false,
     },
     admin: {
-      defaultColumns: ['operation', 'entity', 'userId', 'createdAt'],
+      defaultColumns: ['operation', 'entity', 'user', 'createdAt'],
       hidden: config.db.collections.logs.hidden,
     },
     fields: [
@@ -51,7 +51,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
         required: true,
       },
       {
-        name: 'userId',
+        name: 'user',
         type: 'relationship',
         access: {
           create: () => false,

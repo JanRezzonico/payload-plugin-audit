@@ -58,7 +58,7 @@ The plugin creates an `audit-plugin-logs` collection by default. Each log contai
 
 - `operation`: `create` or `update`.
 - `entity`: a polymorphic relationship to the audited document.
-- `userId`: a polymorphic relationship to the user who performed the operation.
+- `user`: a polymorphic relationship to the user who performed the operation.
 - `delta`: the `jsondiffpatch` result for updates.
 - Payload-managed `createdAt` and `updatedAt` timestamps.
 

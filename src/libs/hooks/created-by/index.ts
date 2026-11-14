@@ -21,7 +21,7 @@ const generateCreatedByHook = (config: PluginConfig): CollectionAfterChangeHook 
         delta: null, // No delta for create operations
         entity: { relationTo: collection.slug, value: doc.id },
         operation: 'create',
-        userId: { relationTo: user.collection, value: user.id },
+        user: { relationTo: user.collection, value: user.id },
       },
       overrideAccess: true,
       req,

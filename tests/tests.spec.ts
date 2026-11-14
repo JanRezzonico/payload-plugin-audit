@@ -224,7 +224,7 @@ describe('plugin collection transform and log collection', () => {
     expect(logs.fields.map((field) => 'name' in field && field.name)).toEqual([
       'operation',
       'entity',
-      'userId',
+      'user',
       'delta',
     ])
     expect(logs.fields[0]).toMatchObject({
@@ -265,7 +265,7 @@ describe('audit hooks', () => {
           delta: null,
           entity: { relationTo: 'posts', value: 'post-1' },
           operation: 'create',
-          userId: { relationTo: 'users', value: 'user-1' },
+          user: { relationTo: 'users', value: 'user-1' },
         },
         overrideAccess: true,
         req: expect.any(Object),
@@ -311,7 +311,7 @@ describe('audit hooks', () => {
           delta: { title: ['Before', 'After'] },
           entity: { relationTo: 'posts', value: 'post-1' },
           operation: 'update',
-          userId: { relationTo: 'other-users', value: 'other-1' },
+          user: { relationTo: 'other-users', value: 'other-1' },
         },
       }),
     )
@@ -342,7 +342,7 @@ describe('virtual audit fields', () => {
     const field = getField(config, 'posts', 'auditPluginCreatedBy')
     const find = vi
       .fn()
-      .mockResolvedValue({ docs: [{ userId: { relationTo: 'users', value: 'u-1' } }] })
+      .mockResolvedValue({ docs: [{ user: { relationTo: 'users', value: 'u-1' } }] })
     const hook = field.hooks.afterRead[0]
 
     await expect(
@@ -385,13 +385,13 @@ describe('virtual audit fields', () => {
           id: 'log-2',
           createdAt: '2026-02-01',
           delta: { title: ['B', 'C'] },
-          userId: { relationTo: 'users', value: 'u-2' },
+          user: { relationTo: 'users', value: 'u-2' },
         },
         {
           id: 'log-1',
           createdAt: '2026-01-01',
           delta: { title: ['A', 'B'] },
-          userId: { relationTo: 'users', value: 'u-1' },
+          user: { relationTo: 'users', value: 'u-1' },
         },
       ],
     })

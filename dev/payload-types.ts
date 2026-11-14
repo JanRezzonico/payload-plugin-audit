@@ -341,7 +341,7 @@ export interface AuditPluginLog {
         relationTo: 'media';
         value: number | Media;
       };
-  userId:
+  user:
     | {
         relationTo: 'users';
         value: number | User;
@@ -562,7 +562,7 @@ export interface OtherUsersSelect<T extends boolean = true> {
 export interface AuditPluginLogsSelect<T extends boolean = true> {
   operation?: T;
   entity?: T;
-  userId?: T;
+  user?: T;
   delta?: T;
   updatedAt?: T;
   createdAt?: T;
