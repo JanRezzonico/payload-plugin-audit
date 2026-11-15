@@ -52,3 +52,7 @@ export const auditPluginPayload =
 
     return payloadConfig
   }
+
+type PayloadPluginAuditConfig = IncomingPluginConfig
+
+export type { PayloadPluginAuditConfig }
