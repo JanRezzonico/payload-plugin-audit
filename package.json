@@ -1,5 +1,5 @@
 {
-  "name": "audit-plugin-payload",
+  "name": "payload-plugin-audit",
   "version": "0.0.1",
   "private": true,
   "description": "",
@@ -11,13 +11,13 @@
     "payload-plugin",
     "payload-plugin-audit"
   ],
-  "homepage": "https://github.com/JanRezzonico/audit-plugin-payload",
+  "homepage": "https://github.com/JanRezzonico/payload-plugin-audit",
   "bugs": {
-    "url": "https://github.com/JanRezzonico/audit-plugin-payload/issues"
+    "url": "https://github.com/JanRezzonico/payload-plugin-audit/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JanRezzonico/audit-plugin-payload.git"
+    "url": "git+https://github.com/JanRezzonico/payload-plugin-audit.git"
   },
   "funding": "https://rezzonico.dev/contact",
   "license": "UNLICENSED",

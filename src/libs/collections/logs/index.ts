@@ -41,7 +41,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
               clientProps: {
                 labels: config.ui.fields.entity.description,
               },
-              path: 'audit-plugin-payload/client#PolymorphicDescription',
+              path: 'payload-plugin-audit/client#PolymorphicDescription',
             },
           },
           readOnly: true,
@@ -67,7 +67,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
               clientProps: {
                 labels: config.ui.fields.user.description,
               },
-              path: 'audit-plugin-payload/client#PolymorphicDescription',
+              path: 'payload-plugin-audit/client#PolymorphicDescription',
             },
           },
           readOnly: true,
@@ -87,7 +87,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
                 colors: config.ui.fields.delta.component.colors,
                 labels: config.ui.fields.delta.component.badgeLabels,
               },
-              path: 'audit-plugin-payload/client#DeltaViewer',
+              path: 'payload-plugin-audit/client#DeltaViewer',
             },
           },
           readOnly: true,

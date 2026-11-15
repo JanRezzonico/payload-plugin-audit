@@ -16,9 +16,9 @@
   "compilerOptions": {
     "paths": {
       "@payload-config": ["./payload.config.ts"],
-      "audit-plugin-payload": ["../src/index.ts"],
-      "audit-plugin-payload/client": ["../src/exports/client.ts"],
-      "audit-plugin-payload/rsc": ["../src/exports/rsc.ts"]
+      "payload-plugin-audit": ["../src/index.ts"],
+      "payload-plugin-audit/client": ["../src/exports/client.ts"],
+      "payload-plugin-audit/rsc": ["../src/exports/rsc.ts"]
     },
     "noEmit": true,
     "emitDeclarationOnly": false

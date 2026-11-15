@@ -18,7 +18,7 @@ const generateUpdateLogsVirtualField = (config: PluginConfig): Field => {
           clientProps: {
             labels: config.ui.fields.delta.rows.labels,
           },
-          path: 'audit-plugin-payload/client#UpdateDeltaRowLabel',
+          path: 'payload-plugin-audit/client#UpdateDeltaRowLabel',
         },
       },
       condition: (data) => {
@@ -40,7 +40,7 @@ const generateUpdateLogsVirtualField = (config: PluginConfig): Field => {
               clientProps: {
                 labels: config.ui.fields.user.description,
               },
-              path: 'audit-plugin-payload/client#PolymorphicDescription',
+              path: 'payload-plugin-audit/client#PolymorphicDescription',
             },
           },
         },
@@ -69,7 +69,7 @@ const generateUpdateLogsVirtualField = (config: PluginConfig): Field => {
                 colors: config.ui.fields.delta.component.colors,
                 labels: config.ui.fields.delta.component.badgeLabels,
               },
-              path: 'audit-plugin-payload/client#DeltaViewer',
+              path: 'payload-plugin-audit/client#DeltaViewer',
             },
           },
         },

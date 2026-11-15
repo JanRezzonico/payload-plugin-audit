@@ -21,9 +21,9 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { PolymorphicDescription as PolymorphicDescription_85c512b97177c319e1736f987b77b664 } from 'audit-plugin-payload/client'
-import { DeltaViewer as DeltaViewer_85c512b97177c319e1736f987b77b664 } from 'audit-plugin-payload/client'
-import { UpdateDeltaRowLabel as UpdateDeltaRowLabel_85c512b97177c319e1736f987b77b664 } from 'audit-plugin-payload/client'
+import { PolymorphicDescription as PolymorphicDescription_e347be6528e39c68bf30b91ad8a936e4 } from 'payload-plugin-audit/client'
+import { DeltaViewer as DeltaViewer_e347be6528e39c68bf30b91ad8a936e4 } from 'payload-plugin-audit/client'
+import { UpdateDeltaRowLabel as UpdateDeltaRowLabel_e347be6528e39c68bf30b91ad8a936e4 } from 'payload-plugin-audit/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -51,8 +51,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "audit-plugin-payload/client#PolymorphicDescription": PolymorphicDescription_85c512b97177c319e1736f987b77b664,
-  "audit-plugin-payload/client#DeltaViewer": DeltaViewer_85c512b97177c319e1736f987b77b664,
-  "audit-plugin-payload/client#UpdateDeltaRowLabel": UpdateDeltaRowLabel_85c512b97177c319e1736f987b77b664,
+  "payload-plugin-audit/client#PolymorphicDescription": PolymorphicDescription_e347be6528e39c68bf30b91ad8a936e4,
+  "payload-plugin-audit/client#DeltaViewer": DeltaViewer_e347be6528e39c68bf30b91ad8a936e4,
+  "payload-plugin-audit/client#UpdateDeltaRowLabel": UpdateDeltaRowLabel_e347be6528e39c68bf30b91ad8a936e4,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

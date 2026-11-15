@@ -1,6 +1,6 @@
 # Audit Plugin for Payload CMS
 
-`audit-plugin-payload` adds an audit trail to Payload CMS collections. It records who created or updated a document, stores update deltas, and exposes the audit information in the Payload admin panel through read-only virtual fields.
+`payload-plugin-audit` adds an audit trail to Payload CMS collections. It records who created or updated a document, stores update deltas, and exposes the audit information in the Payload admin panel through read-only virtual fields.
 
 ## Features
 
@@ -18,11 +18,11 @@
 Install the plugin in your Payload application:
 
 ```bash
-npm install audit-plugin-payload
+npm install payload-plugin-audit
 # or
-pnpm add audit-plugin-payload
+pnpm add payload-plugin-audit
 # or
-yarn add audit-plugin-payload
+yarn add payload-plugin-audit
 ```
 
 ## Basic Usage
@@ -30,7 +30,7 @@ yarn add audit-plugin-payload
 Add the plugin to the `plugins` array in `payload.config.ts`:
 
 ```ts
-import { auditPluginPayload } from 'audit-plugin-payload'
+import { auditPluginPayload } from 'payload-plugin-audit'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -120,14 +120,14 @@ It is recommended to set `access.delete` to `false` and rely solely on the plugi
 
 ### Admin UI
 
-Labels, date formatting, delta badges, and badge colors can be customized through the `ui` option. The client components are also available from the `audit-plugin-payload/client` export:
+Labels, date formatting, delta badges, and badge colors can be customized through the `ui` option. The client components are also available from the `payload-plugin-audit/client` export:
 
 ```ts
 import {
 	DeltaViewer,
 	UpdateDeltaRowLabel,
 	UserDescription,
-} from 'audit-plugin-payload/client'
+} from 'payload-plugin-audit/client'
 ```
 
 These components are primarily intended for Payload admin component configuration and are already wired into the generated fields and audit-log collection.
