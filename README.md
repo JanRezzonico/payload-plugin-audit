@@ -34,16 +34,18 @@ import { auditPluginPayload } from 'payload-plugin-audit'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
-	collections: [Posts, Users],
-	plugins: [
-		auditPluginPayload({
-			access: {
-				delete: ({ req }) => false, // Disable manual logs deletion
-				read: ({ req }) => Boolean(req.user), // Only logged-in users can read logs
-			},
-			collections: ['posts'],
-			userCollections: ['users'],
-		}),
+  collections: [Posts, Users],
+    plugins: [
+	  auditPluginPayload({
+		access: {
+		  // Disable manual logs deletion
+		  delete: ({ req }) => false,
+		  // Only logged-in users can read logs
+		  read: ({ req }) => Boolean(req.user),
+		},
+		collections: ['posts'],
+		userCollections: ['users'],
+	  }),
 	],
 })
 ```
@@ -93,16 +95,16 @@ The defaults can be overridden when a migration or an existing naming convention
 
 ```ts
 db: {
-	collections: {
-		logs: {
-			slug: 'my-custom-audit-logs-collection-slug',
-			hidden: true,
-		},
+  collections: {
+	logs: {
+	  slug: 'my-custom-collection-slug',
+	  hidden: true,
 	},
-	fields: {
-		createdBy: { name: 'myCustomCreatedByFieldName' },
-		updateLogs: { name: 'myCustomUpdateLogsFieldName' },
-	},
+  },
+  fields: {
+	createdBy: { name: 'myCustomCreatedBy' },
+	updateLogs: { name: 'myCustomUpdateLogs' },
+  },
 },
 ```
 
@@ -130,13 +132,17 @@ This repository includes a Payload example application in `dev/`:
 
 ```bash
 pnpm install
-pnpm docker:reload # Brings down current compose and its volumes, then brings it back up with a fresh database
+pnpm docker:reload
 pnpm dev
 ```
 
 Useful commands:
 
 ```bash
-pnpm test # Run unit and integration tests
-pnpm lint # Run ESLint
+pnpm test
+pnpm lint
 ```
+
+## License
+
+This project is licensed under the Mozilla Public License 2.0. See the [LICENSE](LICENSE) file for details.
