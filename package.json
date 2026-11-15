@@ -2,15 +2,16 @@
   "name": "payload-plugin-audit",
   "version": "0.0.1",
   "private": true,
-  "description": "",
+  "description": "Audit trail plugin for Payload CMS: records who created or updated documents, stores update deltas, and shows them in the admin panel.",
   "keywords": [
-    "payloadcms",
     "audit",
-    "plugin",
-    "payload",
+    "audit-log",
+    "audit-trail",
     "payload-plugin",
-    "payload-plugin-audit"
+    "payloadcms",
+    "plugin"
   ],
+  "packageManager": "pnpm@12.3.4",
   "homepage": "https://github.com/JanRezzonico/payload-plugin-audit",
   "bugs": {
     "url": "https://github.com/JanRezzonico/payload-plugin-audit/issues"
@@ -93,15 +94,12 @@
     "vitest": "4.0.18"
   },
   "peerDependencies": {
-    "payload": "^3.93.0"
+    "payload": "^3.93.0",
+    "@payloadcms/ui": "^3.93.0",
+    "react": "^19.0.0"
   },
   "engines": {
-    "node": ">=26.0.0",
-    "pnpm": "^12"
-  },
-  "devEngines": {
-    "node": ">=26.0.0",
-    "pnpm": "^12"
+    "node": ">=22.0.0"
   },
   "publishConfig": {
     "exports": {

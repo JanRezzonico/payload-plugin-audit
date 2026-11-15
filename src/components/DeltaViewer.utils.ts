@@ -1,8 +1,8 @@
 import type { Delta } from 'jsondiffpatch'
 import type { Op } from 'jsondiffpatch/formatters/jsonpatch'
 import type { CSSProperties } from 'react'
-import type { DeltaComponentColors } from 'src/config/ui/types.js'
 
+import type { DeltaComponentColors } from '../config/ui/types.js'
 import type { DeltaViewerOpKind } from './DeltaViewer.types.js'
 
 function parsePointer(pointer: string): string[] {

@@ -1,8 +1,8 @@
 'use client'
 
-import type { EntityDescriptionProps } from 'src/config/ui/types.js'
-
 import { useConfig, useFormFields } from '@payloadcms/ui'
+
+import type { EntityDescriptionProps } from '../config/ui/types.js'
 
 import { buildCollectionHref, buildEntityHref, formFieldValueToTypedObject } from './utils.js'
 

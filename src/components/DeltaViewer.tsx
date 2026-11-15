@@ -3,15 +3,14 @@
 import type { Delta } from 'jsondiffpatch'
 import type { Op } from 'jsondiffpatch/formatters/jsonpatch'
 import type { ReactNode } from 'react'
-import type { DeltaComponentColors } from 'src/config/ui/types.js'
 
 import { useField } from '@payloadcms/ui'
 import * as jsonpatchFormatter from 'jsondiffpatch/formatters/jsonpatch'
+import { useMemo } from 'react'
 
 import './DeltaViewer.css'
 
-import { useMemo } from 'react'
-
+import type { DeltaComponentColors } from '../config/ui/types.js'
 import type {
   DeltaViewerChipVariant,
   DeltaViewerKindLabels,

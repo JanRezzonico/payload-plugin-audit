@@ -120,17 +120,9 @@ It is recommended to set `access.delete` to `false` and rely solely on the plugi
 
 ### Admin UI
 
-Labels, date formatting, delta badges, and badge colors can be customized through the `ui` option. The client components are also available from the `payload-plugin-audit/client` export:
+Labels, date formatting, delta badges, and badge colors can be customized through the `ui` option.
 
-```ts
-import {
-	DeltaViewer,
-	UpdateDeltaRowLabel,
-	UserDescription,
-} from 'payload-plugin-audit/client'
-```
-
-These components are primarily intended for Payload admin component configuration and are already wired into the generated fields and audit-log collection.
+The client components are also available from the `payload-plugin-audit/client` export, however, they are primarily intended for Payload admin component configuration and are already wired into the generated fields and audit-log collection.
 
 ## Development
 

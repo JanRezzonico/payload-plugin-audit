@@ -1,7 +1,7 @@
 'use client'
-import type { PluginConfig } from 'src/config/types.js'
-
 import { useFormFields, useRowLabel } from '@payloadcms/ui'
+
+import type { PluginConfig } from '../config/types.js'
 
 const fill = (template: string, number: number) => {
   return template.replaceAll('{number}', String(number))

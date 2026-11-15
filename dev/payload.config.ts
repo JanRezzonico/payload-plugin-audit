@@ -1,8 +1,8 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { auditPluginPayload } from 'payload-plugin-audit'
 import path from 'path'
 import { buildConfig } from 'payload'
+import { auditPluginPayload } from 'payload-plugin-audit'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
