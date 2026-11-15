@@ -20,7 +20,7 @@
     "url": "git+https://github.com/JanRezzonico/payload-plugin-audit.git"
   },
   "funding": "https://rezzonico.dev/contact",
-  "license": "UNLICENSED",
+  "license": "MPL-2.0",
   "author": "Jan Rezzonico <jan@rezzonico.dev> (https://rezzonico.dev)",
   "type": "module",
   "exports": {
