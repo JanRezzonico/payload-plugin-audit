@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-audit",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "description": "Audit trail plugin for Payload CMS: records who created or updated documents, stores update deltas, and shows them in the admin panel.",
   "keywords": [
@@ -94,8 +94,8 @@
     "vitest": "4.0.18"
   },
   "peerDependencies": {
-    "payload": "^3.93.0",
     "@payloadcms/ui": "^3.93.0",
+    "payload": "^3.93.0",
     "react": "^19.0.0"
   },
   "engines": {
