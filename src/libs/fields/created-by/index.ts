@@ -1,5 +1,6 @@
 import type { Field } from 'payload'
-import type { PluginConfig } from 'src/config/types.js'
+
+import type { PluginConfig } from '../../../config/types.js'
 
 const generateCreatedByVirtualField = (config: PluginConfig): Field => ({
   name: config.db.fields.createdBy.name,

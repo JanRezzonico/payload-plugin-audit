@@ -1,7 +1,6 @@
-import { AuditPluginValidationError } from 'src/utils/AuditPluginValidationError.js'
-
 import type { IncomingPluginConfig, PluginConfig } from './types.js'
 
+import { AuditPluginValidationError } from '../utils/AuditPluginValidationError.js'
 import { validateAccess } from './access/validate.js'
 import { validateCollections } from './collections/validate.js'
 import { validateDb } from './db/validate.js'

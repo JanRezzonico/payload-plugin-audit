@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
-import type { PluginConfig } from 'src/config/types.js'
+
+import type { PluginConfig } from '../../../config/types.js'
 
 const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
   return {

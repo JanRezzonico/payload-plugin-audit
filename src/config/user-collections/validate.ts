@@ -1,6 +1,6 @@
-import { AuditPluginValidationError } from 'src/utils/AuditPluginValidationError.js'
-
 import type { IncomingPluginConfig, PluginConfig } from '../types.js'
+
+import { AuditPluginValidationError } from '../../utils/AuditPluginValidationError.js'
 
 /**
  * @throws `AuditPluginValidationError` if the config is not valid

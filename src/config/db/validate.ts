@@ -1,8 +1,8 @@
 import { deepMergeWithSourceArrays } from 'payload'
-import { AuditPluginValidationError } from 'src/utils/AuditPluginValidationError.js'
 
 import type { IncomingPluginConfig, PluginConfig } from '../types.js'
 
+import { AuditPluginValidationError } from '../../utils/AuditPluginValidationError.js'
 import { dbDefaults } from './defaults.js'
 
 /**

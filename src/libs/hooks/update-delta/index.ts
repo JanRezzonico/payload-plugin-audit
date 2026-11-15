@@ -1,7 +1,8 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import type { PluginConfig } from 'src/config/types.js'
 
 import * as jsondiffpatch from 'jsondiffpatch'
+
+import type { PluginConfig } from '../../../config/types.js'
 
 const generateUpdateDeltaHook = (config: PluginConfig): CollectionAfterChangeHook => {
   return async ({ collection, context, doc, operation, previousDoc, req }) => {

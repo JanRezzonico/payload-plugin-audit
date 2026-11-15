@@ -1,5 +1,6 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import type { PluginConfig } from 'src/config/types.js'
+
+import type { PluginConfig } from '../../../config/types.js'
 
 const generateCreatedByHook = (config: PluginConfig): CollectionAfterChangeHook => {
   return async ({ collection, context, doc, operation, req }) => {
