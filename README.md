@@ -30,24 +30,25 @@ yarn add payload-plugin-audit
 Add the plugin to the `plugins` array in `payload.config.ts`:
 
 ```ts
-import { auditPluginPayload } from 'payload-plugin-audit'
-import { buildConfig } from 'payload'
+import { auditPluginPayload } from "payload-plugin-audit";
+import { buildConfig } from "payload";
 
 export default buildConfig({
   collections: [Posts, Users],
-    plugins: [
-	  auditPluginPayload({
-		access: {
-		  // Disable manual logs deletion
-		  delete: ({ req }) => false,
-		  // Only logged-in users can read logs
-		  read: ({ req }) => Boolean(req.user),
-		},
-		collections: ['posts'],
-		userCollections: ['users'],
-	  }),
-	],
-})
+  plugins: [
+    auditPluginPayload({
+      access: {
+        // Disable manual logs deletion
+        delete: ({ req }) => false,
+        // Only logged-in users can read logs
+        read: ({ req }) => Boolean(req.user),
+      },
+      collections: ["posts"],
+      userCollections: ["users"],
+    }),
+  ],
+});
+
 ```
 
 `collections` contains the slugs to audit. `userCollections` contains every auth-enabled collection whose users may create or update an audited document. Both arrays are required and cannot be empty.
@@ -128,19 +129,26 @@ The client components are also available from the `payload-plugin-audit/client` 
 
 ## Development
 
-This repository includes a Payload example application in `dev/`:
+### Prerequisites
+
+- Node.js 22+
+- Docker & Docker Compose
+- pnpm
+
+### Development Setup
 
 ```bash
-pnpm install
-pnpm docker:reload
-pnpm dev
+pnpm install # install dependencies
+pnpm docker:reload # start the database
+pnpm dev # start the development server
 ```
 
 Useful commands:
 
 ```bash
-pnpm test
-pnpm lint
+pnpm test # run tests
+pnpm lint # run linter
+pnpm build # build the plugin
 ```
 
 ## License
