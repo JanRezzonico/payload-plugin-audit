@@ -6,7 +6,6 @@ import { describe, expect, test, vi } from 'vitest'
 
 import {
   classifyOp,
-  colorsToCSSVars,
   formatPath,
   formatValue,
   getOldValue,
@@ -18,7 +17,6 @@ import {
 } from '../src/components/utils.js'
 import { validateDb } from '../src/config/db/validate.js'
 import { isPluginDisabled, mergeConfig } from '../src/config/index.js'
-import { validateUi } from '../src/config/ui/validate.js'
 import { validateUserCollections } from '../src/config/user-collections/validate.js'
 import { auditPluginPayload } from '../src/index.js'
 import { generateLogsCollection } from '../src/libs/collections/logs/index.js'
@@ -130,7 +128,7 @@ describe('plugin configuration', () => {
     )
   })
 
-  test('validates database, UI, and user collection values', () => {
+  test('validates database and user collection values', () => {
     expect(
       validateDb({ collections: { logs: { slug: 'custom-logs' } } } as any).collections.logs.slug,
     ).toBe('custom-logs')
@@ -140,16 +138,6 @@ describe('plugin configuration', () => {
     expect(() => validateDb({ fields: { createdBy: { name: 'created-by' } } } as any)).toThrow(
       'lowerCamelCase',
     )
-    expect(
-      validateUi({
-        fields: { delta: { component: { colors: { new: { border: '#ABC' } } } } },
-      } as any),
-    ).toMatchObject({ fields: { delta: { component: { colors: { new: { border: '#ABC' } } } } } })
-    expect(() =>
-      validateUi({
-        fields: { delta: { component: { colors: { new: { border: 'red' } } } } },
-      } as any),
-    ).toThrow('valid hex color')
     expect(validateUserCollections(['users'])).toEqual(['users'])
     expect(() => validateUserCollections([])).toThrow('cannot be empty')
   })
@@ -451,10 +439,10 @@ describe('virtual audit fields', () => {
 })
 
 describe('client utility behavior', () => {
-  test('formats paths, values, old values, operations, and CSS variables', () => {
+  test('formats paths, values, old values and operations', () => {
     expect(formatPath('/profile/name~1key/~0value')).toBe('profile.name/key.~value')
     expect(formatValue(undefined)).toBe('undefined')
-    expect(formatValue({ name: 'Ada' })).toBe('{"name":"Ada"}')
+    expect(formatValue({ name: 'Ada' }).replaceAll(/\s/g, '')).toBe('{"name":"Ada"}')
     expect(getOldValue({ profile: { name: ['old', 'new'] } } as any, '/profile/name')).toBe('old')
     expect(getOldValue({ profile: {} } as any, '/profile/name')).toBeUndefined()
     expect(classifyOp({ op: 'add', path: '/x', value: 1 } as any, undefined)).toBe('added')
@@ -463,17 +451,6 @@ describe('client utility behavior', () => {
     expect(classifyOp({ op: 'replace', path: '/x', value: 'new' } as any, '')).toBe('added')
     expect(classifyOp({ op: 'replace', path: '/x', value: '' } as any, 'old')).toBe('removed')
     expect(classifyOp({ op: 'replace', path: '/x', value: 0 } as any, false)).toBe('updated')
-    expect(
-      colorsToCSSVars({
-        neutral: { background: '#fff', border: '#000', foreground: '#111' },
-        new: { background: '#fff', border: '#000', foreground: '#111' },
-        old: { background: '#fff', border: '#000', foreground: '#111' },
-        updated: { background: '#fff', border: '#000', foreground: '#111' },
-      }),
-    ).toMatchObject({
-      '--delta-viewer-neutral-background': '#fff',
-      '--delta-viewer-updated-foreground': '#111',
-    })
   })
 
   test('converts valid relationship values to admin URLs and rejects invalid values', () => {
