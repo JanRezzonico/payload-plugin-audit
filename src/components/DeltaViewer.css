@@ -4,80 +4,19 @@
   gap: 0.5rem;
 }
 
-.DeltaViewer__chip,
-.DeltaViewer__op-title-chip {
-  border-radius: 3px;
-  padding: 1px 5px;
-}
-
-.DeltaViewer__chip {
-  font-family: monospace;
-  word-break: break-all;
-}
-
-.DeltaViewer__op-title-chip {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.DeltaViewer__chip[data-variant='old'],
-.DeltaViewer__op-title-chip[data-variant='old'] {
-  background-color: var(--delta-viewer-old-background);
-  color: var(--delta-viewer-old-foreground);
-}
-
-.DeltaViewer__chip[data-variant='new'],
-.DeltaViewer__op-title-chip[data-variant='new'] {
-  background-color: var(--delta-viewer-new-background);
-  color: var(--delta-viewer-new-foreground);
-}
-
-.DeltaViewer__chip[data-variant='neutral'],
-.DeltaViewer__op-title-chip[data-variant='neutral'] {
-  background-color: var(--delta-viewer-neutral-background);
-  color: var(--delta-viewer-neutral-foreground);
-}
-
-.DeltaViewer__chip[data-variant='update'],
-.DeltaViewer__op-title-chip[data-variant='update'] {
-  background-color: var(--delta-viewer-updated-background);
-  color: var(--delta-viewer-updated-foreground);
-}
-
-.DeltaViewer__chip[data-variant='old'] {
-  text-decoration: line-through;
-}
-
 .DeltaViewer__arrow {
-  font-family: monospace;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
 .DeltaViewer__op {
-  --op-border: var(--delta-viewer-neutral-border);
-  border: 1px solid var(--op-border);
-  border-left-width: 3px;
-  border-radius: 4px;
-  padding: 6px 10px;
-  font-family: monospace;
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-m);
+  padding: calc(var(--base) / 2) var(--base);
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.DeltaViewer__op[data-variant='new'] {
-  --op-border: var(--delta-viewer-new-border);
-}
-
-.DeltaViewer__op[data-variant='old'] {
-  --op-border: var(--delta-viewer-old-border);
-}
-
-.DeltaViewer__op[data-variant='update'] {
-  --op-border: var(--delta-viewer-updated-border);
+  gap: 0.5rem;
 }
 
 .DeltaViewer__op-title-container {
@@ -97,8 +36,4 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-}
-
-.DeltaViewer__raw summary {
-  cursor: pointer;
 }

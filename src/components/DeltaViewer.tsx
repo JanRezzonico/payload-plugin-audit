@@ -4,13 +4,12 @@ import type { Delta } from 'jsondiffpatch'
 import type { Op } from 'jsondiffpatch/formatters/jsonpatch'
 import type { ReactNode } from 'react'
 
-import { useField } from '@payloadcms/ui'
+import { CodeEditor, Collapsible, Pill, useField } from '@payloadcms/ui'
 import * as jsonpatchFormatter from 'jsondiffpatch/formatters/jsonpatch'
 import { useMemo } from 'react'
 
 import './DeltaViewer.css'
 
-import type { DeltaComponentColors } from '../config/ui/types.js'
 import type {
   DeltaViewerChipVariant,
   DeltaViewerKindLabels,
@@ -18,19 +17,28 @@ import type {
   DeltaViewerOpKind,
 } from './DeltaViewer.types.js'
 
-import {
-  classifyOp,
-  colorsToCSSVars,
-  formatPath,
-  formatValue,
-  getOldValue,
-} from './DeltaViewer.utils.js'
+import { classifyOp, formatPath, formatValue, getOldValue } from './DeltaViewer.utils.js'
 
-function Chip({ children, variant }: { children: ReactNode; variant: DeltaViewerChipVariant }) {
+function Chip({
+  bold,
+  children,
+  variant,
+}: {
+  bold?: boolean
+  children: ReactNode
+  variant: DeltaViewerChipVariant
+}) {
+  const pillStyleByVariant = {
+    neutral: 'light',
+    new: 'success',
+    old: 'error',
+    update: 'warning',
+  } as const
+
   return (
-    <span className="DeltaViewer__chip" data-variant={variant}>
-      {children}
-    </span>
+    <Pill pillStyle={pillStyleByVariant[variant]} size="small">
+      {bold ? <strong>{children}</strong> : children}
+    </Pill>
   )
 }
 
@@ -40,10 +48,20 @@ function Arrow() {
 
 function RawJSON({ value }: { value: unknown }) {
   return (
-    <details className="DeltaViewer__raw">
-      <summary>Raw JSON diff</summary>
-      <pre>{JSON.stringify(value, null, 2)}</pre>
-    </details>
+    <Collapsible header="Raw JSON diff" initCollapsed>
+      <CodeEditor
+        defaultLanguage="json"
+        maxHeight={500}
+        minHeight={80}
+        options={{
+          lineNumbers: 'off',
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+        }}
+        readOnly={true}
+        value={value ? JSON.stringify(value, null, 2) : 'undefined'}
+      />
+    </Collapsible>
   )
 }
 
@@ -95,9 +113,9 @@ function OpRow({
   return (
     <div className="DeltaViewer__op" data-variant={variant}>
       <div className="DeltaViewer__op-title-container">
-        <span className="DeltaViewer__op-title-chip" data-variant={variant}>
-          {text}
-        </span>
+        <Chip bold variant={variant}>
+          {text.toUpperCase()}
+        </Chip>
         <span className="DeltaViewer__op-title-path">{formatPath(op.path)}</span>
       </div>
       {op.op !== 'remove' && (
@@ -119,12 +137,11 @@ function Message({ children, value }: { children: ReactNode; value: unknown }) {
 }
 
 type Props = {
-  colors: DeltaComponentColors
   labels: DeltaViewerLabels
   path: string
 }
 
-function DeltaViewer({ colors, labels, path }: Props) {
+function DeltaViewer({ labels, path }: Props) {
   const { value } = useField<Delta>({ path })
   const kindLabels: DeltaViewerKindLabels = {
     added: { text: labels.added, variant: 'new' },
@@ -152,10 +169,8 @@ function DeltaViewer({ colors, labels, path }: Props) {
     return <Message value={value}>No changes recorded</Message>
   }
 
-  const colorsStyle = colorsToCSSVars(colors)
-
   return (
-    <div className="DeltaViewer__container" style={colorsStyle}>
+    <div className="DeltaViewer__container">
       {result.ops.map((op) => (
         <OpRow delta={value} key={`${op.op}:${op.path}`} kindLabels={kindLabels} op={op} />
       ))}
