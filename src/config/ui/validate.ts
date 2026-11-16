@@ -2,7 +2,6 @@ import { deepMergeWithSourceArrays } from 'payload'
 
 import type { IncomingPluginConfig, PluginConfig } from '../types.js'
 
-import { AuditPluginValidationError } from '../../utils/AuditPluginValidationError.js'
 import { uiDefaults } from './defaults.js'
 
 /**
@@ -21,22 +20,6 @@ const validateUi = (incomingConfig: IncomingPluginConfig['ui']): PluginConfig['u
 
   merged.fields.entity.description.beforeId = merged.fields.entity.description.beforeId.trim() + ' '
 
-  const hasInvalidColor = Object.values(merged.fields.delta.component.colors).some((group) =>
-    Object.values(group).some((value) => !isHexColor(value)),
-  )
-
-  if (hasInvalidColor) {
-    throw new AuditPluginValidationError(
-      `Invalid color value in custom UI configuration.
-      All colors must be valid hex color strings (case insensitive).
-      (Example: #ff0000 or #f00)`,
-    )
-  }
-
   return merged
 }
-
-const HEX_COLOR_REGEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i
-const isHexColor = (color: string): boolean => HEX_COLOR_REGEX.test(color)
-
 export { validateUi }

@@ -53,82 +53,60 @@ export default buildConfig({
             // hidden: true,
           },
         },
-        fields: {
-          createdBy: {
-            name: 'myCustomCreatedBy',
-          },
-          updateLogs: {
-            name: 'myCustomUpdateLogs',
-          },
-        },
+        // fields: {
+        //   createdBy: {
+        //     name: 'myCustomCreatedBy',
+        //   },
+        //   updateLogs: {
+        //     name: 'myCustomUpdateLogs',
+        //   },
+        // },
       },
       state: 'enabled',
       ui: {
         fields: {
-          createdBy: {
-            label: 'This entity was created by',
-          },
-          delta: {
-            component: {
-              badgeLabels: {
-                added: 'Addition',
-                moved: 'Move',
-                removed: 'Removal',
-                updated: 'Update',
-              },
-              colors: {
-                // neutral: {
-                //   background: '#0000fd',
-                //   border: '#0f0',
-                //   foreground: '#f00',
-                // },
-                // new: {
-                //   background: 'pink',
-                //   border: 'red',
-                //   foreground: 'yellow',
-                // },
-                // old: {
-                //   background: '#0000fd',
-                //   border: '#0f0',
-                //   foreground: '#f00',
-                // },
-                // updated: {
-                //   background: '#0000fd',
-                //   border: '#0f0',
-                //   foreground: '#f00',
-                // },
-              },
-            },
-            rows: {
-              labels: {
-                change: 'My custom change number {number}',
-                fallback: 'My custom fallback',
-                latestChange: 'My custom latest change',
-              },
-            },
-          },
-          entity: {
-            description: {
-              beforeCollection: 'The entity is from the collection:                  ',
-              beforeId: 'The entity id is:                  ',
-              // separator: '<><><>',
-            },
-          },
-          updateLogs: {
-            date: {
-              // displayFormat: 'HH:mm',
-              label: 'My custom date label',
-            },
-            label: 'This is the update log',
-          },
-          user: {
-            description: {
-              beforeCollection: 'The user is from the collection:                  ',
-              beforeId: 'The user id is:                  ',
-              // separator: '---',
-            },
-            label: 'This is the user we are talking about',
-          },
+          // createdBy: {
+          //   label: 'This entity was created by',
+          // },
+          // delta: {
+          //   component: {
+          //     badgeLabels: {
+          //       added: 'Addition',
+          //       moved: 'Move',
+          //       removed: 'Removal',
+          //       updated: 'Update',
+          //     },
+          //   },
+          //   rows: {
+          //     labels: {
+          //       change: 'My custom change number {number}',
+          //       fallback: 'My custom fallback',
+          //       latestChange: 'My custom latest change',
+          //     },
+          //   },
+          // },
+          // entity: {
+          //   description: {
+          //     beforeCollection: 'The entity is from the collection:                  ',
+          //     beforeId: 'The entity id is:                  ',
+          //     // separator: '<><><>',
+          //   },
+          // },
+          // updateLogs: {
+          //   date: {
+          //     // displayFormat: 'HH:mm',
+          //     label: 'My custom date label',
+          //   },
+          //   label: 'This is the update log',
+          // },
+          // user: {
+          //   description: {
+          //     beforeCollection: 'The user is from the collection:                  ',
+          //     beforeId: 'The user id is:                  ',
+          //     // separator: '---',
+          //   },
+          //   label: 'This is the user we are talking about',
+          // },
         },
       },
       userCollections: ['users', 'other-users'],
