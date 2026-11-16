@@ -27,6 +27,12 @@ const generateUpdateDeltaHook = (config: PluginConfig): CollectionAfterChangeHoo
     delete nextData.createdAt
     delete original.updatedAt
     delete nextData.updatedAt
+
+    // Exclude the plugin's own fields from the delta
+    delete original[config.db.fields.createdBy.name]
+    delete nextData[config.db.fields.createdBy.name]
+    delete original[config.db.fields.updateLogs.name]
+    delete nextData[config.db.fields.updateLogs.name]
     const delta = jsondiffpatch.diff(original, nextData)
 
     await req.payload.create({
