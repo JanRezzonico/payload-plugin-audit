@@ -59,7 +59,7 @@
     "test": "pnpm test:int",
     "test:e2e": "playwright test",
     "test:int": "vitest",
-    "preversion": "pnpm lint && pnpm test && pnpm build"
+    "preversion": "pnpm lint && pnpm test --run && pnpm build && echo 'Preversion checks passed. Proceeding with version bump.'"
   },
   "dependencies": {
     "jsondiffpatch": "0.7.7"
