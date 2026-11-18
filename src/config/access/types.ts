@@ -4,7 +4,17 @@ type AccessRead = Access & FieldAccess
 
 type AccessDelete = Access & FieldAccess
 
+type AccessCreate = Access & FieldAccess
+
 type ConfigAccess = {
+  /**
+   * Payload access control function to determine which
+   * users can create audit logs.
+   *
+   * @example ({ req }) => { return false } // Deny everyone
+   */
+  create: AccessCreate
+
   /**
    * Payload access control function to determine which
    * users can manually delete audit logs.

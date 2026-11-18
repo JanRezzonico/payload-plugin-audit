@@ -28,6 +28,7 @@ type Doc = Record<string, any>
 type HookArgs = Parameters<CollectionAfterChangeHook>[0]
 
 const access = {
+  create: vi.fn(({ req }: any) => Boolean(req.user)),
   delete: vi.fn(({ req }: any) => req.user?.role === 'admin'),
   read: vi.fn(({ req }: any) => Boolean(req.user)),
 }
@@ -206,8 +207,8 @@ describe('plugin collection transform and log collection', () => {
       admin: { hidden: false },
       timestamps: true,
     })
-    expect(logs.access?.create?.({ req: { user: { role: 'admin' } } } as any)).toBe(false)
-    expect(logs.access?.read?.({ req: { user: null } } as any)).toBe(false)
+    expect(logs.access?.create).toBe(access.create)
+    expect(logs.access?.read).toBe(access.read)
     expect(logs.access?.delete).toBe(access.delete)
     expect(logs.fields.map((field) => 'name' in field && field.name)).toEqual([
       'operation',

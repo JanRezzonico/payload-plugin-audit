@@ -6,7 +6,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
   return {
     slug: config.db.collections.logs.slug,
     access: {
-      create: () => false,
+      create: config.access.create,
       delete: config.access.delete,
       read: config.access.read,
       update: () => false,
@@ -20,7 +20,6 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
         name: 'operation',
         type: 'select',
         access: {
-          create: () => false,
           update: () => false,
         },
         admin: {
@@ -33,7 +32,6 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
         name: 'entity',
         type: 'relationship',
         access: {
-          create: () => false,
           update: () => false,
         },
         admin: {
@@ -55,7 +53,6 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
         name: 'user',
         type: 'relationship',
         access: {
-          create: () => false,
           update: () => false,
         },
         label: config.ui.fields.user.label,
@@ -78,7 +75,6 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
         name: 'delta',
         type: 'json',
         access: {
-          create: () => false,
           update: () => false,
         },
         admin: {
