@@ -28,5 +28,11 @@ export const Posts: CollectionConfig = {
       name: 'someJson',
       type: 'json',
     },
+    {
+      name: 'referencedBy',
+      type: 'join',
+      collection: 'post-referencers',
+      on: 'post',
+    },
   ],
 }

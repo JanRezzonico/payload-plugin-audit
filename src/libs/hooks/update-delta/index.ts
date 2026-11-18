@@ -18,22 +18,34 @@ const generateUpdateDeltaHook = (config: PluginConfig): CollectionAfterChangeHoo
       return
     }
 
-    // Exclude the id and timestamps from the delta, as they are not relevant to the update delta
     const original = structuredClone(previousDoc) as Record<string, unknown>
     const nextData = structuredClone(doc) as Record<string, unknown>
-    delete original.id
-    delete nextData.id
-    delete original.createdAt
-    delete nextData.createdAt
-    delete original.updatedAt
-    delete nextData.updatedAt
 
-    // Exclude the plugin's own fields from the delta
-    delete original[config.db.fields.createdBy.name]
-    delete nextData[config.db.fields.createdBy.name]
-    delete original[config.db.fields.updateLogs.name]
-    delete nextData[config.db.fields.updateLogs.name]
+    const excluded = [
+      'id',
+      'createdAt',
+      'updatedAt',
+      config.db.fields.createdBy.name,
+      config.db.fields.updateLogs.name,
+
+      // Avoid join fields, which are computed on read, to be part of the diff
+      // if they want to be tracked, they should be tracked in the original collection,
+      // where they are a "relationship" field, and not in the collection where they are a "join" field
+      ...(collection.flattenedFields ?? []).filter((f) => f.type === 'join').map((f) => f.name),
+    ]
+
+    for (const key of excluded) {
+      delete original[key]
+      delete nextData[key]
+    }
+
     const delta = jsondiffpatch.diff(original, nextData)
+
+    if (!delta) {
+      // If there is no delta diff, it means that there are no changes to log,
+      // so we don't create one at all
+      return
+    }
 
     await req.payload.create({
       collection: config.db.collections.logs.slug,

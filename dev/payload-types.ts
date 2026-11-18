@@ -72,18 +72,24 @@ export interface Config {
     media: Media;
     users: User;
     'other-users': OtherUser;
+    'post-referencers': PostReferencer;
     'audit-plugin-logs': AuditPluginLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    posts: {
+      referencedBy: 'post-referencers';
+    };
+  };
   collectionsSelect: {
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'other-users': OtherUsersSelect<false> | OtherUsersSelect<true>;
+    'post-referencers': PostReferencersSelect<false> | PostReferencersSelect<true>;
     'audit-plugin-logs': AuditPluginLogsSelect<false> | AuditPluginLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -183,7 +189,12 @@ export interface Post {
     | number
     | boolean
     | null;
-  myCustomCreatedBy?:
+  referencedBy?: {
+    docs?: (number | PostReferencer)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  auditPluginCreatedBy?:
     | ({
         relationTo: 'users';
         value: number | User;
@@ -192,7 +203,7 @@ export interface Post {
         relationTo: 'other-users';
         value: number | OtherUser;
       } | null);
-  myCustomUpdateLogs?:
+  auditPluginUpdateLogs?:
     | {
         user?:
           | ({
@@ -280,7 +291,7 @@ export interface OtherUser {
 export interface Media {
   id: number;
   alt?: string | null;
-  myCustomCreatedBy?:
+  auditPluginCreatedBy?:
     | ({
         relationTo: 'users';
         value: number | User;
@@ -289,7 +300,7 @@ export interface Media {
         relationTo: 'other-users';
         value: number | OtherUser;
       } | null);
-  myCustomUpdateLogs?:
+  auditPluginUpdateLogs?:
     | {
         user?:
           | ({
@@ -327,6 +338,50 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-referencers".
+ */
+export interface PostReferencer {
+  id: number;
+  title: string;
+  post: number | Post;
+  auditPluginCreatedBy?:
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'other-users';
+        value: number | OtherUser;
+      } | null);
+  auditPluginUpdateLogs?:
+    | {
+        user?:
+          | ({
+              relationTo: 'users';
+              value: number | User;
+            } | null)
+          | ({
+              relationTo: 'other-users';
+              value: number | OtherUser;
+            } | null);
+        date?: string | null;
+        delta?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-plugin-logs".
  */
 export interface AuditPluginLog {
@@ -340,6 +395,10 @@ export interface AuditPluginLog {
     | {
         relationTo: 'media';
         value: number | Media;
+      }
+    | {
+        relationTo: 'post-referencers';
+        value: number | PostReferencer;
       };
   user:
     | {
@@ -401,6 +460,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'other-users';
         value: number | OtherUser;
+      } | null)
+    | ({
+        relationTo: 'post-referencers';
+        value: number | PostReferencer;
       } | null)
     | ({
         relationTo: 'audit-plugin-logs';
@@ -468,8 +531,9 @@ export interface PostsSelect<T extends boolean = true> {
   author?: T;
   media?: T;
   someJson?: T;
-  myCustomCreatedBy?: T;
-  myCustomUpdateLogs?:
+  referencedBy?: T;
+  auditPluginCreatedBy?: T;
+  auditPluginUpdateLogs?:
     | T
     | {
         user?: T;
@@ -486,8 +550,8 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  myCustomCreatedBy?: T;
-  myCustomUpdateLogs?:
+  auditPluginCreatedBy?: T;
+  auditPluginUpdateLogs?:
     | T
     | {
         user?: T;
@@ -554,6 +618,25 @@ export interface OtherUsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-referencers_select".
+ */
+export interface PostReferencersSelect<T extends boolean = true> {
+  title?: T;
+  post?: T;
+  auditPluginCreatedBy?: T;
+  auditPluginUpdateLogs?:
+    | T
+    | {
+        user?: T;
+        date?: T;
+        delta?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 
 import { Media } from './collections/Media.js'
 import { OtherUsers } from './collections/OtherUsers.js'
+import { PostReferencers } from './collections/PostReferencers.js'
 import { Posts } from './collections/Posts.js'
 import { Users } from './collections/Users.js'
 import { seed } from './seed.js'
@@ -22,7 +23,7 @@ export default buildConfig({
       importMapFile: path.resolve(dirname, 'app/(payload)/admin/importMap.js'),
     },
   },
-  collections: [Posts, Media, Users, OtherUsers],
+  collections: [Posts, Media, Users, OtherUsers, PostReferencers],
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
@@ -45,7 +46,7 @@ export default buildConfig({
           )
         },
       },
-      collections: ['posts', 'media'],
+      collections: ['posts', 'media', 'post-referencers'],
       db: {
         collections: {
           logs: {
