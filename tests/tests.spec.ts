@@ -129,6 +129,46 @@ describe('plugin configuration', () => {
     )
   })
 
+  test('merges partial access overrides independently and keeps secure defaults', () => {
+    const request = (user: unknown) => ({ req: { user } }) as any
+    const customCreate = vi.fn(() => true)
+    const customDelete = vi.fn(() => true)
+    const customRead = vi.fn(() => false)
+
+    const withoutAccess = mergeConfig({ ...baseConfig, access: undefined } as any)
+    expect(withoutAccess.access.create(request({ id: 'user-1' }))).toBe(false)
+    expect(withoutAccess.access.delete(request({ id: 'user-1' }))).toBe(false)
+    expect(withoutAccess.access.read(request({ id: 'user-1' }))).toBe(true)
+    expect(withoutAccess.access.read(request(null))).toBe(false)
+
+    const partial = mergeConfig({
+      ...baseConfig,
+      access: { create: customCreate },
+    } as any)
+    expect(partial.access.create).toBe(customCreate)
+    expect(partial.access.delete(request({ id: 'user-1' }))).toBe(false)
+    expect(partial.access.read(request({ id: 'user-1' }))).toBe(true)
+
+    const mixed = mergeConfig({
+      ...baseConfig,
+      access: { create: customCreate, delete: customDelete, read: customRead },
+    } as any)
+    expect(mixed.access.create).toBe(customCreate)
+    expect(mixed.access.delete).toBe(customDelete)
+    expect(mixed.access.read).toBe(customRead)
+    expect(mixed.access.create(request(null))).toBe(true)
+    expect(mixed.access.delete(request(null))).toBe(true)
+    expect(mixed.access.read(request({ id: 'user-1' }))).toBe(false)
+
+    const invalid = mergeConfig({
+      ...baseConfig,
+      access: { create: null, delete: 'not-an-access-function', read: undefined },
+    } as any)
+    expect(invalid.access.create(request({ id: 'user-1' }))).toBe(false)
+    expect(invalid.access.delete(request({ id: 'user-1' }))).toBe(false)
+    expect(invalid.access.read(request({ id: 'user-1' }))).toBe(true)
+  })
+
   test('validates database and user collection values', () => {
     expect(
       validateDb({ collections: { logs: { slug: 'custom-logs' } } } as any).collections.logs.slug,

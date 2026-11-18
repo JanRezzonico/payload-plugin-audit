@@ -34,4 +34,4 @@ type ConfigAccess = {
   read: AccessRead
 }
 
-export type { AccessDelete, AccessRead, ConfigAccess }
+export type { AccessCreate, AccessDelete, AccessRead, ConfigAccess }

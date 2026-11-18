@@ -25,7 +25,7 @@ type IncomingPluginConfig = {
   /**
    * Payload access control configuration for the audit plugin.
    */
-  access: ConfigAccess
+  access: Partial<ConfigAccess>
 
   /**
    * Payload configuration for the collections that should be audited.
