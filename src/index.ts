@@ -32,10 +32,24 @@ export const auditPluginPayload =
     const logsCollection = generateLogsCollection(config)
     const createdByVirtualField = generateCreatedByVirtualField(config)
     const updateLogsVirtualField = generateUpdateLogsVirtualField(config)
+    const reservedFieldNames = new Set([
+      config.db.fields.createdBy.name,
+      config.db.fields.updateLogs.name,
+    ])
 
     const collections = existingCollections.map((collection) => {
       if (!config.collections.includes(collection.slug)) {
         return collection
+      }
+
+      if (
+        collection.fields?.some(
+          (field) => 'name' in field && reservedFieldNames.has(field.name),
+        )
+      ) {
+        throw new AuditPluginValidationError(
+          `An audited collection already contains a reserved field name`,
+        )
       }
 
       return {
