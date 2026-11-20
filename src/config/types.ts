@@ -31,6 +31,11 @@ type IncomingPluginConfig = {
   access: Partial<ConfigAccess>
 
   /**
+   * Configures the scheduled cleanup of old update logs.
+   */
+  cleanup?: DeepPartial<ConfigCleanup>
+
+  /**
    * Payload configuration for the collections that should be audited.
    *
    * This is an array of collection slugs.
@@ -41,13 +46,6 @@ type IncomingPluginConfig = {
    *
    * @example ['posts', 'media']
    */
-  /**
-   * Configures the scheduled cleanup of old update logs.
-   *
-   * @default { olderThanDays: 90, schedule: '* 0 0 * * *' }
-   */
-  cleanup?: DeepPartial<ConfigCleanup>
-
   collections: ConfigCollections
 
   /**

@@ -8,7 +8,8 @@ import { generateCreatedByVirtualField } from './libs/fields/created-by/index.js
 import { generateUpdateLogsVirtualField } from './libs/fields/update-logs/index.js'
 import { generateCreatedByHook } from './libs/hooks/created-by/index.js'
 import { generateUpdateDeltaHook } from './libs/hooks/update-delta/index.js'
-import { generateCleanupLogsTask } from './libs/jobs/cleanup-logs/index.js'
+import { applyCleanupJobs } from './libs/jobs/cleanup-logs/index.js'
+import { AuditPluginValidationError } from './utils/AuditPluginValidationError.js'
 
 export const auditPluginPayload =
   (incomingConfig: IncomingPluginConfig) =>
@@ -18,46 +19,46 @@ export const auditPluginPayload =
     }
 
     const config = mergeConfig(incomingConfig)
-    const { state } = config
+    const { cleanup, state } = config
+    const collectionSlug = config.db.collections.logs.slug
+
+    const existingCollections = payloadConfig.collections ?? []
+    if (existingCollections.some((collection) => collection.slug === collectionSlug)) {
+      throw new AuditPluginValidationError(
+        `A collection with slug "${collectionSlug}" already exists`,
+      )
+    }
 
     const logsCollection = generateLogsCollection(config)
-
     const createdByVirtualField = generateCreatedByVirtualField(config)
     const updateLogsVirtualField = generateUpdateLogsVirtualField(config)
 
-    payloadConfig.collections = payloadConfig.collections ?? []
-    payloadConfig.collections.push(logsCollection)
-
-    payloadConfig.jobs = payloadConfig.jobs ?? {}
-    payloadConfig.jobs.tasks = [
-      ...(payloadConfig.jobs.tasks ?? []),
-      generateCleanupLogsTask(config),
-    ]
-
-    payloadConfig.collections.forEach((collection) => {
-      if (collection.slug === config.db.collections.logs.slug) {
-        return
-      }
+    const collections = existingCollections.map((collection) => {
       if (!config.collections.includes(collection.slug)) {
-        return
+        return collection
       }
 
-      if (state !== 'inactive') {
-        const createdByHook = generateCreatedByHook(config)
-        const updateDeltaHook = generateUpdateDeltaHook(config)
-        collection.hooks = collection.hooks ?? {}
-        collection.hooks.afterChange = [
-          ...(collection.hooks.afterChange ?? []),
-          createdByHook,
-          updateDeltaHook,
-        ]
+      return {
+        ...collection,
+        fields: [...(collection.fields ?? []), createdByVirtualField, updateLogsVirtualField],
+        hooks: {
+          ...collection.hooks,
+          ...(state !== 'inactive' && {
+            afterChange: [
+              ...(collection.hooks?.afterChange ?? []),
+              generateCreatedByHook(config),
+              generateUpdateDeltaHook(config),
+            ],
+          }),
+        },
       }
-
-      collection.fields = collection.fields ?? []
-      collection.fields = [...collection.fields, createdByVirtualField, updateLogsVirtualField]
     })
 
-    return payloadConfig
+    return {
+      ...payloadConfig,
+      collections: [...collections, logsCollection],
+      ...(cleanup.enabled && { jobs: applyCleanupJobs(payloadConfig.jobs, config) }),
+    }
   }
 
 type PayloadPluginAuditConfig = IncomingPluginConfig
