@@ -2,6 +2,8 @@
 
 `payload-plugin-audit` adds an audit trail to Payload CMS collections. It records who created or updated a document, stores update deltas, and exposes the audit information in the Payload admin panel through read-only virtual fields.
 
+> Note: This plugin is in early development and may not be suitable for production use yet. Please report any issues you encounter. Until version 1.x.x, the plugin is not considered stable and may have breaking changes in minor releases. Please pin to a specific version if you want to avoid unexpected changes and manually upgrade after reviewing the release notes and changelog.
+
 ## Features
 
 - Records `create` and `update` operations in a dedicated audit-log collection.
