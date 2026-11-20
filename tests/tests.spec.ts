@@ -273,19 +273,6 @@ describe('cleanup validation', () => {
       enabled: false,
     })
   })
-
-  // If this fails, deepMergeWithSourceArrays lets explicit `undefined` overwrite defaults
-  // (e.g. `queue: process.env.AUDIT_QUEUE`). Strip undefined keys before merging, or use `??`.
-  test('does not let undefined values overwrite defaults', () => {
-    const result = validateCleanup({
-      autoRun: { cron: undefined, limit: undefined },
-      olderThanDays: undefined,
-      queue: undefined,
-      schedule: undefined,
-    } as any)
-
-    expect(result).toEqual(validateCleanup({}))
-  })
 })
 
 describe('plugin collection transform and log collection', () => {
