@@ -14,6 +14,7 @@
 - Renders update deltas in the admin panel with the included `DeltaViewer` component.
 - Supports polymorphic relationships to one or more user collections.
 - Allows the log collection, generated field names, access rules, labels, and colors to be customized.
+- Automatically removes old `update` logs on a configurable schedule while preserving `create` logs.
 
 ## Installation
 
@@ -115,6 +116,20 @@ Changing collection slug or field names changes the database schema and generate
 `access.delete` controls manual delete access on the audit-log collection.
 
 Keep `access.delete` restrictive as users with it can remove parts of the audit trail.
+
+### Log cleanup
+
+Old `update` logs are removed by a scheduled Payload job. `create` logs are never removed by this job.
+
+```ts
+cleanup: {
+  olderThanDays: 90,
+  schedule: '* 0 0 * * *',
+},
+```
+
+`olderThanDays` defaults to `90`, and `schedule` defaults to daily at midnight. The schedule uses
+Payload's six-field cron format.
 
 By default, `access.read` is set to allow only authenticated users to read logs, and `access.delete` is set to disallow all users from deleting or creating logs manually.
 

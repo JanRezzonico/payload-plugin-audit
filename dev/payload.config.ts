@@ -46,6 +46,10 @@ export default buildConfig({
           )
         },
       },
+      cleanup: {
+        olderThanDays: 1,
+        schedule: '* 0 0 * * *',
+      },
       collections: ['posts', 'media', 'post-referencers'],
       db: {
         collections: {

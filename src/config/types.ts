@@ -1,4 +1,5 @@
 import type { ConfigAccess } from './access/types.js'
+import type { ConfigCleanup } from './cleanup/types.js'
 import type { ConfigCollections } from './collections/types.js'
 import type { ConfigDb } from './db/types.js'
 import type { ConfigState } from './state/types.js'
@@ -9,6 +10,8 @@ type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]>
 
 type PluginConfig = {
   access: ConfigAccess
+
+  cleanup: ConfigCleanup
 
   collections: ConfigCollections
 
@@ -38,6 +41,13 @@ type IncomingPluginConfig = {
    *
    * @example ['posts', 'media']
    */
+  /**
+   * Configures the scheduled cleanup of old update logs.
+   *
+   * @default { olderThanDays: 90, schedule: '* 0 0 * * *' }
+   */
+  cleanup?: DeepPartial<ConfigCleanup>
+
   collections: ConfigCollections
 
   /**

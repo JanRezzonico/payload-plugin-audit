@@ -2,6 +2,7 @@ import type { IncomingPluginConfig, PluginConfig } from './types.js'
 
 import { AuditPluginValidationError } from '../utils/AuditPluginValidationError.js'
 import { validateAccess } from './access/validate.js'
+import { validateCleanup } from './cleanup/validate.js'
 import { validateCollections } from './collections/validate.js'
 import { validateDb } from './db/validate.js'
 import { stateDefault } from './state/defaults.js'
@@ -23,6 +24,7 @@ const mergeConfig = (incomingConfig: IncomingPluginConfig): PluginConfig => {
     throw new AuditPluginValidationError('Audit plugin is disabled but the config is being merged')
   }
   const access = validateAccess(incomingConfig.access)
+  const cleanup = validateCleanup(incomingConfig.cleanup)
   const collections = validateCollections(incomingConfig.collections)
   const db = validateDb(incomingConfig.db)
   const ui = validateUi(incomingConfig.ui)
@@ -31,6 +33,7 @@ const mergeConfig = (incomingConfig: IncomingPluginConfig): PluginConfig => {
 
   return {
     access,
+    cleanup,
     collections,
     db,
     state,

@@ -15,6 +15,7 @@ import {
   buildEntityHref,
   formFieldValueToTypedObject,
 } from '../src/components/utils.js'
+import { validateCleanup } from '../src/config/cleanup/validate.js'
 import { validateDb } from '../src/config/db/validate.js'
 import { isPluginDisabled, mergeConfig } from '../src/config/index.js'
 import { validateUserCollections } from '../src/config/user-collections/validate.js'
@@ -22,6 +23,7 @@ import { auditPluginPayload } from '../src/index.js'
 import { generateLogsCollection } from '../src/libs/collections/logs/index.js'
 import { generateCreatedByHook } from '../src/libs/hooks/created-by/index.js'
 import { generateUpdateDeltaHook } from '../src/libs/hooks/update-delta/index.js'
+import { generateCleanupLogsTask } from '../src/libs/jobs/cleanup-logs/index.js'
 import { AuditPluginValidationError } from '../src/utils/AuditPluginValidationError.js'
 
 type Doc = Record<string, any>
@@ -110,6 +112,7 @@ describe('plugin configuration', () => {
     } as any)
 
     expect(merged.state).toBe('enabled')
+    expect(merged.cleanup).toEqual({ olderThanDays: 90, schedule: '* 0 0 * * *' })
     expect(merged.db).toMatchObject({
       collections: { logs: { slug: 'content-audit-logs', hidden: true } },
       fields: {
@@ -117,15 +120,25 @@ describe('plugin configuration', () => {
         updateLogs: { name: 'auditPluginUpdateLogs' },
       },
     })
+
     expect(merged.ui.fields.createdBy.label).toBe('Author')
     expect(merged.ui.fields.user.description).toMatchObject({
       beforeCollection: 'Collection: ',
       beforeId: 'User id: ',
       separator: '/',
     })
+
     expect(() => mergeConfig({ ...baseConfig, state: 'disabled' } as any)).toThrow(
       AuditPluginValidationError,
     )
+  })
+
+  test('validates cleanup settings', () => {
+    expect(validateCleanup({ olderThanDays: 7, schedule: '0 0 * * * *' })).toEqual({
+      olderThanDays: 7,
+      schedule: '0 0 * * * *',
+    })
+    expect(() => validateCleanup({ olderThanDays: 0 } as any)).toThrow('positive integer')
   })
 
   test('merges partial access overrides independently and keeps secure defaults', () => {
@@ -217,6 +230,45 @@ describe('plugin collection transform and log collection', () => {
     expect(posts?.hooks?.afterChange).toHaveLength(3)
     expect(posts?.hooks?.afterChange?.[0]).toBe(existingHook)
     expect(findCollection(config, 'media')?.fields).toEqual([])
+  })
+
+  test('adds the scheduled cleanup task without replacing existing jobs', () => {
+    const existingTask = { slug: 'existing-task', handler: vi.fn() }
+    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
+    config.jobs = { tasks: [existingTask] }
+    auditPluginPayload(baseConfig as any)(config)
+
+    expect(config.jobs?.tasks).toHaveLength(2)
+    expect(config.jobs?.tasks?.[0]).toBe(existingTask)
+    expect(config.jobs?.tasks?.[1]).toMatchObject({
+      slug: 'payload-plugin-audit-cleanup-logs',
+      schedule: [{ cron: '* 0 0 * * *', queue: 'default' }],
+    })
+  })
+
+  test('cleanup deletes only old update logs', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-01-31T00:00:00.000Z'))
+    const cleanupConfig = mergeConfig({
+      ...baseConfig,
+      cleanup: { olderThanDays: 30 },
+    } as any)
+    const deleteMany = vi.fn()
+    const task = generateCleanupLogsTask(cleanupConfig)
+
+    await (task.handler as any)({ req: { payload: { db: { deleteMany } } } })
+
+    expect(deleteMany).toHaveBeenCalledWith({
+      collection: 'audit-plugin-logs',
+      req: { payload: { db: { deleteMany } } },
+      where: {
+        and: [
+          { operation: { equals: 'update' } },
+          { createdAt: { less_than: '2026-01-01T00:00:00.000Z' } },
+        ],
+      },
+    })
+    vi.useRealTimers()
   })
 
   test('keeps virtual fields but omits hooks when inactive and initializes missing collections', () => {

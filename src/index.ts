@@ -8,6 +8,7 @@ import { generateCreatedByVirtualField } from './libs/fields/created-by/index.js
 import { generateUpdateLogsVirtualField } from './libs/fields/update-logs/index.js'
 import { generateCreatedByHook } from './libs/hooks/created-by/index.js'
 import { generateUpdateDeltaHook } from './libs/hooks/update-delta/index.js'
+import { generateCleanupLogsTask } from './libs/jobs/cleanup-logs/index.js'
 
 export const auditPluginPayload =
   (incomingConfig: IncomingPluginConfig) =>
@@ -26,6 +27,12 @@ export const auditPluginPayload =
 
     payloadConfig.collections = payloadConfig.collections ?? []
     payloadConfig.collections.push(logsCollection)
+
+    payloadConfig.jobs = payloadConfig.jobs ?? {}
+    payloadConfig.jobs.tasks = [
+      ...(payloadConfig.jobs.tasks ?? []),
+      generateCleanupLogsTask(config),
+    ]
 
     payloadConfig.collections.forEach((collection) => {
       if (collection.slug === config.db.collections.logs.slug) {
