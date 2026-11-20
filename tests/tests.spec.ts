@@ -28,7 +28,6 @@ type Doc = Record<string, any>
 type HookArgs = Parameters<CollectionAfterChangeHook>[0]
 
 const access = {
-  create: vi.fn(({ req }: any) => Boolean(req.user)),
   delete: vi.fn(({ req }: any) => req.user?.role === 'admin'),
   read: vi.fn(({ req }: any) => Boolean(req.user)),
 }
@@ -136,7 +135,6 @@ describe('plugin configuration', () => {
     const customRead = vi.fn(() => false)
 
     const withoutAccess = mergeConfig({ ...baseConfig, access: undefined } as any)
-    expect(withoutAccess.access.create(request({ id: 'user-1' }))).toBe(false)
     expect(withoutAccess.access.delete(request({ id: 'user-1' }))).toBe(false)
     expect(withoutAccess.access.read(request({ id: 'user-1' }))).toBe(true)
     expect(withoutAccess.access.read(request(null))).toBe(false)
@@ -145,7 +143,6 @@ describe('plugin configuration', () => {
       ...baseConfig,
       access: { create: customCreate },
     } as any)
-    expect(partial.access.create).toBe(customCreate)
     expect(partial.access.delete(request({ id: 'user-1' }))).toBe(false)
     expect(partial.access.read(request({ id: 'user-1' }))).toBe(true)
 
@@ -153,10 +150,8 @@ describe('plugin configuration', () => {
       ...baseConfig,
       access: { create: customCreate, delete: customDelete, read: customRead },
     } as any)
-    expect(mixed.access.create).toBe(customCreate)
     expect(mixed.access.delete).toBe(customDelete)
     expect(mixed.access.read).toBe(customRead)
-    expect(mixed.access.create(request(null))).toBe(true)
     expect(mixed.access.delete(request(null))).toBe(true)
     expect(mixed.access.read(request({ id: 'user-1' }))).toBe(false)
 
@@ -164,7 +159,6 @@ describe('plugin configuration', () => {
       ...baseConfig,
       access: { create: null, delete: 'not-an-access-function', read: undefined },
     } as any)
-    expect(invalid.access.create(request({ id: 'user-1' }))).toBe(false)
     expect(invalid.access.delete(request({ id: 'user-1' }))).toBe(false)
     expect(invalid.access.read(request({ id: 'user-1' }))).toBe(true)
   })
@@ -247,7 +241,6 @@ describe('plugin collection transform and log collection', () => {
       admin: { hidden: false },
       timestamps: true,
     })
-    expect(logs.access?.create).toBe(access.create)
     expect(logs.access?.read).toBe(access.read)
     expect(logs.access?.delete).toBe(access.delete)
     expect(logs.fields.map((field) => 'name' in field && field.name)).toEqual([

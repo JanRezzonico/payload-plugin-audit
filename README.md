@@ -114,11 +114,9 @@ Changing collection slug or field names changes the database schema and generate
 
 `access.delete` controls manual delete access on the audit-log collection.
 
-`access.create` controls manual create access on the audit-log collection, but it is not recommended to allow users to create logs manually as it can break the audit trail.
+Keep `access.delete` restrictive as users with it can remove parts of the audit trail.
 
-Keep `access.delete` and `access.create` restrictive as users with it can remove parts of the audit trail.
-
-By default, `access.read` is set to allow only authenticated users to read logs, and `access.delete` and `access.create` are set to disallow all users from deleting or creating logs manually.
+By default, `access.read` is set to allow only authenticated users to read logs, and `access.delete` is set to disallow all users from deleting or creating logs manually.
 
 ### Admin UI
 

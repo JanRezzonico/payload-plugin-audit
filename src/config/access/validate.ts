@@ -9,13 +9,10 @@ const validateAccess = (access: IncomingPluginConfig['access']): PluginConfig['a
   if (!access) {
     return accessDefaults
   }
-
-  const create = typeof access.create === 'function' ? access.create : accessDefaults.create
   const deleteAccess = typeof access.delete === 'function' ? access.delete : accessDefaults.delete
   const read = typeof access.read === 'function' ? access.read : accessDefaults.read
 
   return {
-    create,
     delete: deleteAccess,
     read,
   } as PluginConfig['access']

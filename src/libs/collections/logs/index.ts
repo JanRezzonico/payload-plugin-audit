@@ -6,7 +6,7 @@ const generateLogsCollection = (config: PluginConfig): CollectionConfig => {
   return {
     slug: config.db.collections.logs.slug,
     access: {
-      create: config.access.create,
+      create: () => false,
       delete: config.access.delete,
       read: config.access.read,
       update: () => false,

@@ -37,9 +37,6 @@ export default buildConfig({
   plugins: [
     auditPluginPayload({
       access: {
-        create: ({ req }) => {
-          return req.user?.collection === 'users' && req.user.role === 'admin'
-        },
         delete: ({ req }) => {
           return req.user?.collection === 'users' && req.user.role === 'admin'
         },
