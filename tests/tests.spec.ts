@@ -51,8 +51,7 @@ const applyPlugin = (
   overrides: Record<string, unknown> = {},
 ) => {
   const config = createPayloadConfig(collections)
-  auditPluginPayload({ ...baseConfig, ...overrides } as any)(config)
-  return config
+  return auditPluginPayload({ ...baseConfig, ...overrides } as any)(config)
 }
 
 const getField = (config: Config, collectionSlug: string, fieldName: string) =>
@@ -112,7 +111,13 @@ describe('plugin configuration', () => {
     } as any)
 
     expect(merged.state).toBe('enabled')
-    expect(merged.cleanup).toEqual({ olderThanDays: 90, schedule: '* 0 0 * * *' })
+    expect(merged.cleanup).toEqual({
+      autoRun: { cron: '* * * * *', enabled: true, limit: 10 },
+      enabled: true,
+      olderThanDays: 90,
+      queue: 'payload-plugin-audit',
+      schedule: '0 0 * * *',
+    })
     expect(merged.db).toMatchObject({
       collections: { logs: { slug: 'content-audit-logs', hidden: true } },
       fields: {
@@ -135,10 +140,30 @@ describe('plugin configuration', () => {
 
   test('validates cleanup settings', () => {
     expect(validateCleanup({ olderThanDays: 7, schedule: '0 0 * * * *' })).toEqual({
+      autoRun: { cron: '* * * * *', enabled: true, limit: 10 },
+      enabled: true,
       olderThanDays: 7,
+      queue: 'payload-plugin-audit',
       schedule: '0 0 * * * *',
     })
     expect(() => validateCleanup({ olderThanDays: 0 } as any)).toThrow('positive integer')
+    expect(() => validateCleanup({ schedule: 'not-a-cron' } as any)).toThrow('valid cron')
+    expect(() => validateCleanup({ autoRun: { cron: 'not-a-cron' } } as any)).toThrow(
+      'cleanup.autoRun.cron',
+    )
+    expect(() => validateCleanup({ autoRun: { limit: 0 } } as any)).toThrow(
+      'cleanup.autoRun.limit',
+    )
+    expect(() => validateCleanup({ queue: '   ' } as any)).toThrow('cleanup.queue')
+    expect(
+      validateCleanup({
+        autoRun: { enabled: false },
+        queue: '  custom-cleanup  ',
+      } as any),
+    ).toMatchObject({
+      autoRun: { enabled: false },
+      queue: 'custom-cleanup',
+    })
   })
 
   test('merges partial access overrides independently and keeps secure defaults', () => {
@@ -236,14 +261,45 @@ describe('plugin collection transform and log collection', () => {
     const existingTask = { slug: 'existing-task', handler: vi.fn() }
     const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
     config.jobs = { tasks: [existingTask] }
-    auditPluginPayload(baseConfig as any)(config)
+    const transformed = auditPluginPayload(baseConfig as any)(config)
 
-    expect(config.jobs?.tasks).toHaveLength(2)
-    expect(config.jobs?.tasks?.[0]).toBe(existingTask)
-    expect(config.jobs?.tasks?.[1]).toMatchObject({
+    expect(transformed.jobs?.tasks).toHaveLength(2)
+    expect(transformed.jobs?.tasks?.[0]).toBe(existingTask)
+    expect(transformed.jobs?.tasks?.[1]).toMatchObject({
       slug: 'payload-plugin-audit-cleanup-logs',
-      schedule: [{ cron: '* 0 0 * * *', queue: 'default' }],
+      retries: 2,
+      schedule: [{ cron: '0 0 * * *', queue: 'payload-plugin-audit' }],
     })
+    expect(transformed.jobs?.autoRun).toEqual([
+      { cron: '* * * * *', limit: 10, queue: 'payload-plugin-audit' },
+    ])
+  })
+
+  test('can disable cleanup jobs and preserve existing jobs', () => {
+    const existingTask = { slug: 'existing-task', handler: vi.fn() }
+    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
+    config.jobs = { tasks: [existingTask] }
+
+    const transformed = auditPluginPayload({
+      ...baseConfig,
+      cleanup: { enabled: false },
+    } as any)(config)
+
+    expect(transformed.jobs).toBe(config.jobs)
+    expect(transformed.jobs?.tasks).toEqual([existingTask])
+  })
+
+  test('does not duplicate an existing auto-run queue', () => {
+    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
+    config.jobs = {
+      autoRun: [{ cron: '*/5 * * * *', limit: 1, queue: 'payload-plugin-audit' }],
+    }
+
+    const transformed = auditPluginPayload(baseConfig as any)(config)
+
+    expect(transformed.jobs?.autoRun).toEqual([
+      { cron: '*/5 * * * *', limit: 1, queue: 'payload-plugin-audit' },
+    ])
   })
 
   test('cleanup deletes only old update logs', async () => {
@@ -273,11 +329,11 @@ describe('plugin collection transform and log collection', () => {
 
   test('keeps virtual fields but omits hooks when inactive and initializes missing collections', () => {
     const config = createPayloadConfig()
-    auditPluginPayload({ ...baseConfig, state: 'inactive' } as any)(config)
+    const transformed = auditPluginPayload({ ...baseConfig, state: 'inactive' } as any)(config)
 
-    expect(config.collections).toHaveLength(1)
-    expect(findCollection(config, 'audit-plugin-logs')).toBeDefined()
-    expect(findCollection(config, 'posts')).toBeUndefined()
+    expect(transformed.collections).toHaveLength(1)
+    expect(findCollection(transformed, 'audit-plugin-logs')).toBeDefined()
+    expect(findCollection(transformed, 'posts')).toBeUndefined()
   })
 
   test('generates the protected polymorphic logs collection', () => {
