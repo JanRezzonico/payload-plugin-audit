@@ -1,12 +1,7 @@
 import type { ConfigCleanup } from './types.js'
 
 const cleanupDefaults: ConfigCleanup = {
-  autoRun: {
-    cron: '* * * * *',
-    enabled: true,
-    limit: 10,
-  },
-  enabled: true,
+  enabled: false,
   olderThanDays: 90,
   queue: 'payload-plugin-audit',
   schedule: '0 0 * * *',

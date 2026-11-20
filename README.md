@@ -95,14 +95,14 @@ The defaults can be overridden when a migration or an existing naming convention
 ```ts
 db: {
   collections: {
-	logs: {
-	  slug: 'my-custom-collection-slug',
-	  hidden: true,
-	},
+    logs: {
+      slug: 'my-custom-collection-slug',
+      hidden: true,
+    },
   },
   fields: {
-	createdBy: { name: 'myCustomCreatedBy' },
-	updateLogs: { name: 'myCustomUpdateLogs' },
+    createdBy: { name: 'myCustomCreatedBy' },
+    updateLogs: { name: 'myCustomUpdateLogs' },
   },
 },
 ```
@@ -119,19 +119,77 @@ Keep `access.delete` restrictive as users with it can remove parts of the audit 
 
 ### Log cleanup
 
-Old `update` logs are removed by a scheduled Payload job. `create` logs are never removed by this job.
+Old `update` logs can be removed by a scheduled Payload job. `create` logs are never removed by this job.
+
+> Cleanup is disabled by default and should be enabled manually
+> with `cleanup.enabled: true` when a jobs runner is set up to handle it.
 
 ```ts
 cleanup: {
+  enabled: false,
   olderThanDays: 90,
-  schedule: '* 0 0 * * *',
+  schedule: '0 0 * * *',
+  queue: 'payload-plugin-audit',
 },
 ```
 
-`olderThanDays` defaults to `90`, and `schedule` defaults to daily at midnight. The schedule uses
-Payload's six-field cron format.
+| Option          | Default                  | Description                                                       |
+| --------------- | ------------------------ | ----------------------------------------------------------------- |
+| `enabled`       | `false`                  | Registers the cleanup task and its schedule.                      |
+| `olderThanDays` | `90`                     | `update` logs older than this many days are deleted.              |
+| `schedule`      | `'0 0 * * *'` (midnight) | Cron expression, five or six fields (six adds seconds precision). |
+| `queue`         | `'payload-plugin-audit'` | Queue the job is added to.                                        |
 
-By default, `access.read` is set to allow only authenticated users to read logs, and `access.delete` is set to disallow all users from deleting or creating logs manually.
+#### You need a jobs runner
+
+The plugin only **queues** the cleanup job. Something has to **run** the queue, otherwise the job just sits there. Pick one that fits your deployment, and use the same queue name as `cleanup.queue`:
+
+**Dedicated server, `autoRun`** (handles both scheduling and running):
+
+```ts
+jobs: {
+  autoRun: [{ cron: '* * * * *', queue: 'payload-plugin-audit' }],
+}
+```
+
+**Dedicated server, bin script:**
+
+```sh
+pnpm payload jobs:run --cron "* * * * *" --queue payload-plugin-audit --handle-schedules
+```
+
+**Serverless (e.g. Vercel):** use an external cron to call both endpoints:
+
+```
+GET /api/payload-jobs/handle-schedules?queue=payload-plugin-audit
+GET /api/payload-jobs/run?queue=payload-plugin-audit
+```
+
+Don't combine `autoRun` with the `handle-schedules` bin script for the same queue, or jobs will be queued twice. Never use `autoRun` on serverless platforms.
+
+#### Running the cleanup yourself
+
+If you'd rather not use the built-in schedule, set `cleanup.enabled: false` and call the cleanup function from your own endpoint, script or task:
+
+```ts
+import { cleanupAuditLogs } from 'payload-plugin-audit'
+
+await cleanupAuditLogs({
+  collectionSlug: 'audit-logs', // your logs collection slug
+  olderThanDays: 30,
+  payload,
+})
+```
+
+If `cleanup.enabled` is `true`, you can also trigger the registered task on demand:
+
+```ts
+import { AUDIT_CLEANUP_TASK_SLUG } from 'payload-plugin-audit'
+
+await payload.jobs.queue({ task: AUDIT_CLEANUP_TASK_SLUG })
+```
+
+The cleanup bypasses collection access control, so it works even though `access.delete` blocks all manual deletes.
 
 ### Admin UI
 

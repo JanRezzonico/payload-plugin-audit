@@ -40,14 +40,6 @@ const validateCleanup = (
     throw new AuditPluginValidationError('cleanup.schedule is not a valid cron expression.')
   }
 
-  if (!isValidCron(merged.autoRun.cron)) {
-    throw new AuditPluginValidationError('cleanup.autoRun.cron is not a valid cron expression.')
-  }
-
-  if (!Number.isInteger(merged.autoRun.limit) || merged.autoRun.limit <= 0) {
-    throw new AuditPluginValidationError('cleanup.autoRun.limit must be a positive integer.')
-  }
-
   return merged
 }
 

@@ -43,9 +43,7 @@ export const auditPluginPayload =
       }
 
       if (
-        collection.fields?.some(
-          (field) => 'name' in field && reservedFieldNames.has(field.name),
-        )
+        collection.fields?.some((field) => 'name' in field && reservedFieldNames.has(field.name))
       ) {
         throw new AuditPluginValidationError(
           `An audited collection already contains a reserved field name`,
@@ -78,3 +76,6 @@ export const auditPluginPayload =
 type PayloadPluginAuditConfig = IncomingPluginConfig
 
 export type { PayloadPluginAuditConfig }
+
+export { cleanupLogs as cleanupAuditLogs } from './libs/jobs/cleanup-logs/cleanup.js'
+export { TASK_SLUG as AUDIT_CLEANUP_TASK_SLUG } from './libs/jobs/cleanup-logs/index.js'
