@@ -19,10 +19,11 @@ import { validateCleanup } from '../src/config/cleanup/validate.js'
 import { validateDb } from '../src/config/db/validate.js'
 import { isPluginDisabled, mergeConfig } from '../src/config/index.js'
 import { validateUserCollections } from '../src/config/user-collections/validate.js'
-import { auditPluginPayload } from '../src/index.js'
+import { AUDIT_CLEANUP_TASK_SLUG, auditPluginPayload, cleanupAuditLogs } from '../src/index.js'
 import { generateLogsCollection } from '../src/libs/collections/logs/index.js'
 import { generateCreatedByHook } from '../src/libs/hooks/created-by/index.js'
 import { generateUpdateDeltaHook } from '../src/libs/hooks/update-delta/index.js'
+import { cleanupLogs } from '../src/libs/jobs/cleanup-logs/cleanup.js'
 import { generateCleanupLogsTask } from '../src/libs/jobs/cleanup-logs/index.js'
 import { AuditPluginValidationError } from '../src/utils/AuditPluginValidationError.js'
 
@@ -34,15 +35,18 @@ const access = {
   read: vi.fn(({ req }: any) => Boolean(req.user)),
 }
 
+// Plain config: cleanup is off by default, so this exercises the real defaults.
 const baseConfig = {
   access,
   collections: ['posts'],
   userCollections: ['users'],
 }
 
+// Same config with the cleanup feature opted in (it is disabled by default).
+const withCleanup = { ...baseConfig, cleanup: { enabled: true } }
+
 const DEFAULT_QUEUE = 'payload-plugin-audit'
 const DEFAULT_TASK_SLUG = 'payload-plugin-audit-cleanup-logs'
-const defaultAutoRunEntry = { cron: '* * * * *', limit: 10, queue: DEFAULT_QUEUE }
 
 const createPayloadConfig = (collections: CollectionConfig[] = []): Config =>
   ({ collections, db: {} as Config['db'], secret: 'test-secret' }) as Config
@@ -121,8 +125,7 @@ describe('plugin configuration', () => {
 
     expect(merged.state).toBe('enabled')
     expect(merged.cleanup).toEqual({
-      autoRun: { cron: '* * * * *', enabled: true, limit: 10 },
-      enabled: true,
+      enabled: false,
       olderThanDays: 90,
       queue: DEFAULT_QUEUE,
       schedule: '0 0 * * *',
@@ -215,10 +218,9 @@ describe('plugin configuration', () => {
 })
 
 describe('cleanup validation', () => {
-  test('applies defaults and accepts valid overrides', () => {
+  test('applies defaults (disabled) and accepts valid overrides', () => {
     expect(validateCleanup({ olderThanDays: 7, schedule: '0 0 * * * *' })).toEqual({
-      autoRun: { cron: '* * * * *', enabled: true, limit: 10 },
-      enabled: true,
+      enabled: false,
       olderThanDays: 7,
       queue: DEFAULT_QUEUE,
       schedule: '0 0 * * * *', // 6-field (seconds) cron is accepted
@@ -226,24 +228,18 @@ describe('cleanup validation', () => {
     expect(validateCleanup(undefined)).toEqual(validateCleanup({}))
   })
 
+  test('is disabled by default and can be enabled explicitly', () => {
+    expect(validateCleanup(undefined).enabled).toBe(false)
+    expect(validateCleanup({}).enabled).toBe(false)
+    expect(validateCleanup({ enabled: true }).enabled).toBe(true)
+  })
+
   test.each([0, -1, 1.5, Number.NaN, Infinity, '7'])('rejects olderThanDays = %s', (value) => {
     expect(() => validateCleanup({ olderThanDays: value } as any)).toThrow('olderThanDays')
   })
 
-  test.each([0, -1, 1.5, Number.NaN, '10'])('rejects autoRun.limit = %s', (value) => {
-    expect(() => validateCleanup({ autoRun: { limit: value } } as any)).toThrow(
-      'cleanup.autoRun.limit',
-    )
-  })
-
   test.each(['not-a-cron', '', '* * *', '99 * * * *'])('rejects schedule = %j', (value) => {
     expect(() => validateCleanup({ schedule: value } as any)).toThrow('cleanup.schedule')
-  })
-
-  test.each(['not-a-cron', '', '99 * * * *'])('rejects autoRun.cron = %j', (value) => {
-    expect(() => validateCleanup({ autoRun: { cron: value } } as any)).toThrow(
-      'cleanup.autoRun.cron',
-    )
   })
 
   test('rejects blank queue and trims surrounding whitespace', () => {
@@ -252,26 +248,19 @@ describe('cleanup validation', () => {
   })
 
   // Validation intentionally stays on even when the feature is disabled.
-  test('keeps validating when cleanup or autoRun is disabled', () => {
+  test('keeps validating when cleanup is disabled', () => {
     expect(() => validateCleanup({ enabled: false, schedule: 'garbage' } as any)).toThrow(
       'cleanup.schedule',
     )
     expect(() => validateCleanup({ enabled: false, olderThanDays: 0 } as any)).toThrow(
       'olderThanDays',
     )
-    expect(() => validateCleanup({ autoRun: { cron: 'garbage', enabled: false } } as any)).toThrow(
-      'cleanup.autoRun.cron',
-    )
-    expect(() => validateCleanup({ autoRun: { enabled: false, limit: 0 } } as any)).toThrow(
-      'cleanup.autoRun.limit',
-    )
+    // Same for the implicit default (disabled): invalid values still throw.
+    expect(() => validateCleanup({ schedule: 'garbage' } as any)).toThrow('cleanup.schedule')
   })
 
   test('accepts valid values when disabled', () => {
-    expect(validateCleanup({ autoRun: { enabled: false }, enabled: false } as any)).toMatchObject({
-      autoRun: { enabled: false },
-      enabled: false,
-    })
+    expect(validateCleanup({ enabled: false })).toMatchObject({ enabled: false })
   })
 })
 
@@ -324,15 +313,18 @@ describe('plugin collection transform and log collection', () => {
     const hostJobs = { tasks: [{ slug: 'existing-task', handler: vi.fn() }] }
     const config = { collections: hostCollections, jobs: hostJobs, secret: 's' } as any
 
-    const transformed = auditPluginPayload(baseConfig as any)(config)
+    // Cleanup is enabled so the jobs transform actually runs against the host jobs.
+    const transformed = auditPluginPayload(withCleanup as any)(config)
 
     expect(transformed).not.toBe(config)
     expect(config.collections).toBe(hostCollections)
     expect(hostCollections).toHaveLength(1)
     expect(posts.fields).toHaveLength(1)
     expect(posts.hooks).toBeUndefined()
+    expect(config.jobs).toBe(hostJobs)
     expect(hostJobs.tasks).toHaveLength(1)
     expect(hostJobs).not.toHaveProperty('autoRun')
+    expect(transformed.jobs).not.toBe(hostJobs)
     expect(transformed.collections?.[0]).not.toBe(posts)
   })
 
@@ -408,7 +400,7 @@ describe('cleanup jobs transform', () => {
     const existingTask = { slug: 'existing-task', handler: vi.fn() }
     const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
     config.jobs = { tasks: [existingTask] }
-    const transformed = auditPluginPayload(baseConfig as any)(config)
+    const transformed = auditPluginPayload(withCleanup as any)(config)
 
     expect(transformed.jobs?.tasks).toHaveLength(2)
     expect(transformed.jobs?.tasks?.[0]).toBe(existingTask)
@@ -417,17 +409,24 @@ describe('cleanup jobs transform', () => {
       retries: 2,
       schedule: [{ cron: '0 0 * * *', queue: DEFAULT_QUEUE }],
     })
-    expect(transformed.jobs?.autoRun).toEqual([defaultAutoRunEntry])
+    expect(transformed.jobs).not.toHaveProperty('autoRun')
   })
 
   test('creates a jobs config when the host has none', () => {
-    const transformed = applyPlugin()
+    const transformed = applyPlugin(undefined, { cleanup: { enabled: true } })
 
     expect(transformed.jobs?.tasks).toHaveLength(1)
-    expect(transformed.jobs?.autoRun).toEqual([defaultAutoRunEntry])
+    expect(transformed.jobs).not.toHaveProperty('autoRun')
   })
 
-  test('cleanup disabled leaves jobs untouched but still adds the logs collection', () => {
+  test('cleanup is off by default: jobs are left untouched but the logs collection is still added', () => {
+    const transformed = applyPlugin()
+
+    expect(transformed.jobs).toBeUndefined()
+    expect(findCollection(transformed, 'audit-plugin-logs')).toBeDefined()
+  })
+
+  test('cleanup disabled explicitly leaves jobs untouched but still adds the logs collection', () => {
     const transformed = applyPlugin([{ slug: 'posts', fields: [] }], {
       cleanup: { enabled: false },
     })
@@ -436,129 +435,61 @@ describe('cleanup jobs transform', () => {
     expect(findCollection(transformed, 'audit-plugin-logs')).toBeDefined()
   })
 
-  test('cleanup disabled preserves existing jobs by reference', () => {
+  test('cleanup disabled (default or explicit) preserves existing jobs by reference', () => {
     const existingTask = { slug: 'existing-task', handler: vi.fn() }
-    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
-    config.jobs = { tasks: [existingTask] }
 
-    const transformed = auditPluginPayload({
+    const byDefault = createPayloadConfig([{ slug: 'posts', fields: [] }])
+    byDefault.jobs = { tasks: [existingTask] }
+    const defaultResult = auditPluginPayload(baseConfig as any)(byDefault)
+
+    expect(defaultResult.jobs).toBe(byDefault.jobs)
+    expect(defaultResult.jobs?.tasks).toEqual([existingTask])
+
+    const explicit = createPayloadConfig([{ slug: 'posts', fields: [] }])
+    explicit.jobs = { tasks: [existingTask] }
+    const explicitResult = auditPluginPayload({
       ...baseConfig,
       cleanup: { enabled: false },
-    } as any)(config)
+    } as any)(explicit)
 
-    expect(transformed.jobs).toBe(config.jobs)
-    expect(transformed.jobs?.tasks).toEqual([existingTask])
+    expect(explicitResult.jobs).toBe(explicit.jobs)
+    expect(explicitResult.jobs?.tasks).toEqual([existingTask])
   })
 
-  test('autoRun disabled adds the task but no autoRun entry', () => {
-    const transformed = applyPlugin([{ slug: 'posts', fields: [] }], {
-      cleanup: { autoRun: { enabled: false } },
-    })
-
-    expect(transformed.jobs?.tasks).toHaveLength(1)
-    expect(transformed.jobs).not.toHaveProperty('autoRun')
-  })
-
-  test('autoRun disabled preserves the host autoRun untouched', () => {
+  // The plugin only queues the cleanup job. Running the queue is up to the host
+  // application (autoRun, bin script, or an external cron hitting the endpoints).
+  test('never adds autoRun and leaves a host autoRun array untouched', () => {
     const hostAutoRun = [{ cron: '*/5 * * * *', queue: 'default' }]
     const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
     config.jobs = { autoRun: hostAutoRun }
 
-    const transformed = auditPluginPayload({
-      ...baseConfig,
-      cleanup: { autoRun: { enabled: false } },
-    } as any)(config)
+    const transformed = auditPluginPayload(withCleanup as any)(config)
 
     expect(transformed.jobs?.autoRun).toBe(hostAutoRun)
+    expect(hostAutoRun).toHaveLength(1)
+    expect(transformed.jobs?.tasks).toHaveLength(1)
   })
 
-  test('appends to a host autoRun array without mutating it', () => {
-    const hostEntry = { cron: '*/5 * * * *', limit: 5, queue: 'default' }
-    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
-    config.jobs = { autoRun: [hostEntry] }
-
-    const transformed = auditPluginPayload(baseConfig as any)(config)
-
-    expect(transformed.jobs?.autoRun).toEqual([hostEntry, defaultAutoRunEntry])
-    expect(config.jobs?.autoRun).toEqual([hostEntry])
-  })
-
-  test('does not duplicate an existing auto-run queue', () => {
-    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
-    config.jobs = {
-      autoRun: [{ cron: '*/5 * * * *', limit: 1, queue: DEFAULT_QUEUE }],
-    }
-
-    const transformed = auditPluginPayload(baseConfig as any)(config)
-
-    expect(transformed.jobs?.autoRun).toEqual([
-      { cron: '*/5 * * * *', limit: 1, queue: DEFAULT_QUEUE },
-    ])
-  })
-
-  test('wraps a host autoRun function instead of spreading it', async () => {
-    const hostEntry = { cron: '*/5 * * * *', queue: 'default' }
-    const hostFn = vi.fn(() => [hostEntry])
+  test('leaves a host autoRun function untouched', () => {
+    const hostFn = vi.fn(() => [{ cron: '*/5 * * * *', queue: 'default' }])
     const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
     config.jobs = { autoRun: hostFn as any }
 
-    const transformed = auditPluginPayload(baseConfig as any)(config)
-    const payload = { id: 'payload' } as any
+    const transformed = auditPluginPayload(withCleanup as any)(config)
 
-    expect(typeof transformed.jobs?.autoRun).toBe('function')
-    await expect((transformed.jobs?.autoRun as any)(payload)).resolves.toEqual([
-      hostEntry,
-      defaultAutoRunEntry,
-    ])
-    expect(hostFn).toHaveBeenCalledWith(payload)
+    expect(transformed.jobs?.autoRun).toBe(hostFn)
+    expect(hostFn).not.toHaveBeenCalled()
   })
 
-  // A function form cannot be inspected without calling it, so the plugin appends
-  // unconditionally. This pins that behavior; change both if you dedupe in the wrapper.
-  test('appends to a host autoRun function even if it already polls the same queue', async () => {
-    const hostEntry = { cron: '*/5 * * * *', queue: DEFAULT_QUEUE }
-    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
-    config.jobs = { autoRun: () => [hostEntry] }
-
-    const transformed = auditPluginPayload(baseConfig as any)(config)
-    const result = await (transformed.jobs?.autoRun as any)({} as any)
-
-    expect(result).toHaveLength(2)
-    expect(result[0]).toEqual(hostEntry)
-  })
-
-  test('uses a custom queue and schedule for both the task and autoRun, trimmed', () => {
+  test('uses a custom queue and schedule for the task, trimmed', () => {
     const transformed = applyPlugin([{ slug: 'posts', fields: [] }], {
-      cleanup: { queue: '  my-queue  ', schedule: '30 2 * * *' },
+      cleanup: { enabled: true, queue: '  my-queue  ', schedule: '30 2 * * *' },
     })
 
     expect(transformed.jobs?.tasks?.[0]).toMatchObject({
       schedule: [{ cron: '30 2 * * *', queue: 'my-queue' }],
     })
-    expect(transformed.jobs?.autoRun).toEqual([{ cron: '* * * * *', limit: 10, queue: 'my-queue' }])
-  })
-
-  test('uses custom autoRun cron and limit', () => {
-    const transformed = applyPlugin([{ slug: 'posts', fields: [] }], {
-      cleanup: { autoRun: { cron: '*/2 * * * *', limit: 3 } },
-    })
-
-    expect(transformed.jobs?.autoRun).toEqual([
-      { cron: '*/2 * * * *', limit: 3, queue: DEFAULT_QUEUE },
-    ])
-  })
-
-  test('appends an autoRun entry for a different queue than the host', () => {
-    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
-    config.jobs = { autoRun: [{ cron: '* * * * *', queue: 'default' }] }
-
-    const transformed = auditPluginPayload({
-      ...baseConfig,
-      cleanup: { queue: 'audit-only' },
-    } as any)(config)
-
-    expect(transformed.jobs?.autoRun).toHaveLength(2)
-    expect((transformed.jobs?.autoRun as any[])[1]).toMatchObject({ queue: 'audit-only' })
+    expect(transformed.jobs).not.toHaveProperty('autoRun')
   })
 
   test('preserves other host jobs settings', () => {
@@ -567,7 +498,7 @@ describe('cleanup jobs transform', () => {
     const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
     config.jobs = { jobsCollectionOverrides, shouldAutoRun } as any
 
-    const transformed = auditPluginPayload(baseConfig as any)(config)
+    const transformed = auditPluginPayload(withCleanup as any)(config)
 
     expect(transformed.jobs?.shouldAutoRun).toBe(shouldAutoRun)
     expect((transformed.jobs as any).jobsCollectionOverrides).toBe(jobsCollectionOverrides)
@@ -577,12 +508,19 @@ describe('cleanup jobs transform', () => {
     const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
     config.jobs = { tasks: [{ slug: DEFAULT_TASK_SLUG, handler: vi.fn() }] } as any
 
-    expect(() => auditPluginPayload(baseConfig as any)(config)).toThrow(AuditPluginValidationError)
+    expect(() => auditPluginPayload(withCleanup as any)(config)).toThrow(AuditPluginValidationError)
+  })
+
+  test('does not check for a task slug collision when cleanup is disabled', () => {
+    const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
+    config.jobs = { tasks: [{ slug: DEFAULT_TASK_SLUG, handler: vi.fn() }] } as any
+
+    expect(() => auditPluginPayload(baseConfig as any)(config)).not.toThrow()
   })
 
   test('does not apply the jobs transform when the plugin is disabled', () => {
     const config = createPayloadConfig([{ slug: 'posts', fields: [] }])
-    const transformed = auditPluginPayload({ ...baseConfig, state: 'disabled' } as any)(config)
+    const transformed = auditPluginPayload({ ...withCleanup, state: 'disabled' } as any)(config)
 
     expect(transformed.jobs).toBeUndefined()
   })
@@ -656,6 +594,82 @@ describe('cleanup task handler', () => {
       (task.handler as any)({ req: { payload: { db: { deleteMany } } } }),
     ).rejects.toThrow('db down')
     expect(task.retries).toBe(2)
+  })
+})
+
+describe('cleanupLogs function', () => {
+  test('deletes only old update logs from the given collection', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-01-31T00:00:00.000Z'))
+    const deleteMany = vi.fn()
+
+    await cleanupLogs({
+      collectionSlug: 'custom-logs',
+      olderThanDays: 30,
+      payload: { db: { deleteMany } } as any,
+    })
+
+    expect(deleteMany).toHaveBeenCalledWith({
+      collection: 'custom-logs',
+      req: undefined,
+      where: {
+        and: [
+          { operation: { equals: 'update' } },
+          { createdAt: { less_than: '2026-01-01T00:00:00.000Z' } },
+        ],
+      },
+    })
+  })
+
+  test('forwards the request when provided', async () => {
+    const deleteMany = vi.fn()
+    const req = { id: 'req' } as any
+
+    await cleanupLogs({
+      collectionSlug: 'audit-plugin-logs',
+      olderThanDays: 1,
+      payload: { db: { deleteMany } } as any,
+      req,
+    })
+
+    expect(deleteMany).toHaveBeenCalledWith(expect.objectContaining({ req }))
+  })
+
+  test('propagates database errors', async () => {
+    const deleteMany = vi.fn().mockRejectedValue(new Error('db down'))
+
+    await expect(
+      cleanupLogs({
+        collectionSlug: 'audit-plugin-logs',
+        olderThanDays: 1,
+        payload: { db: { deleteMany } } as any,
+      }),
+    ).rejects.toThrow('db down')
+  })
+
+  test('is exposed publicly together with the task slug', () => {
+    expect(cleanupAuditLogs).toBe(cleanupLogs)
+    expect(AUDIT_CLEANUP_TASK_SLUG).toBe(DEFAULT_TASK_SLUG)
+
+    const transformed = applyPlugin(undefined, { cleanup: { enabled: true } })
+    expect(transformed.jobs?.tasks?.some((task) => task.slug === AUDIT_CLEANUP_TASK_SLUG)).toBe(
+      true,
+    )
+  })
+
+  test('works without the plugin scheduling anything (cleanup disabled)', async () => {
+    const transformed = applyPlugin()
+    const deleteMany = vi.fn()
+
+    expect(transformed.jobs).toBeUndefined()
+    await expect(
+      cleanupAuditLogs({
+        collectionSlug: 'audit-plugin-logs',
+        olderThanDays: 30,
+        payload: { db: { deleteMany } } as any,
+      }),
+    ).resolves.toBeUndefined()
+    expect(deleteMany).toHaveBeenCalledTimes(1)
   })
 })
 
