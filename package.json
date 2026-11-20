@@ -62,6 +62,7 @@
     "preversion": "pnpm lint && pnpm test --run && pnpm build && echo 'Preversion checks passed. Proceeding with version bump.'"
   },
   "dependencies": {
+    "croner": "^11.0.1",
     "jsondiffpatch": "0.7.7"
   },
   "devDependencies": {

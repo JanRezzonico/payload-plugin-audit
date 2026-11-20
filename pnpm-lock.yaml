@@ -109,6 +109,9 @@ importers:
 
   .:
     dependencies:
+      croner:
+        specifier: ^11.0.1
+        version: 11.0.1
       jsondiffpatch:
         specifier: 0.7.7
         version: 0.7.7
@@ -2865,6 +2868,10 @@ packages:
 
   croner@10.0.1:
     resolution: {integrity: sha512-ixNtAJndqh173VQ4KodSdJEI6nuioBWI0V1ITNKhZZsO0pEMoDxz539T4FTTbSZ/xIOSuDnzxLVRqBVSvPNE2g==}
+    engines: {node: '>=18.0'}
+
+  croner@11.0.1:
+    resolution: {integrity: sha512-/fmHcoczPy5cMcmJ6ex7J7LAwb545V1dNmRrdDGP3hwStg/06IYP56YgBySCSdWGDz2PJYQyDukaR8b8R5o2HA==}
     engines: {node: '>=18.0'}
 
   cross-env@7.0.3:
@@ -8058,6 +8065,8 @@ snapshots:
       yaml: 1.10.3
 
   croner@10.0.1: {}
+
+  croner@11.0.1: {}
 
   cross-env@7.0.3:
     dependencies:
