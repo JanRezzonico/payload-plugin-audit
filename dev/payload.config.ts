@@ -31,9 +31,9 @@ export default buildConfig({
     push: true,
   }),
   editor: lexicalEditor(),
-  // jobs: {
-  //   autoRun: [{ cron: '* * * * *', queue: AUDIT_PLUGIN_QUEUE }],
-  // },
+  jobs: {
+    autoRun: [{ cron: '* * * * *', queue: AUDIT_PLUGIN_QUEUE }],
+  },
   onInit: async (payload) => {
     await seed(payload)
   },
