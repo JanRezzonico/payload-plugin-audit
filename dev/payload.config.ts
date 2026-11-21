@@ -2,7 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
-import { AUDIT_PLUGIN_DEFAULT_QUEUE, auditPluginPayload } from 'payload-plugin-audit'
+import { AUDIT_PLUGIN_QUEUE, auditPluginPayload } from 'payload-plugin-audit'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
@@ -31,9 +31,9 @@ export default buildConfig({
     push: true,
   }),
   editor: lexicalEditor(),
-  jobs: {
-    autoRun: [{ cron: '* * * * *', queue: AUDIT_PLUGIN_DEFAULT_QUEUE }],
-  },
+  // jobs: {
+  //   autoRun: [{ cron: '* * * * *', queue: AUDIT_PLUGIN_QUEUE }],
+  // },
   onInit: async (payload) => {
     await seed(payload)
   },

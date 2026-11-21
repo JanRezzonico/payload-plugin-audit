@@ -26,12 +26,6 @@ const validateCleanup = (
     incomingConfig ?? {},
   )
 
-  merged.queue = merged.queue.trim()
-
-  if (merged.queue.length === 0) {
-    throw new AuditPluginValidationError('cleanup.queue must not be empty.')
-  }
-
   if (!Number.isInteger(merged.olderThanDays) || merged.olderThanDays <= 0) {
     throw new AuditPluginValidationError('cleanup.olderThanDays must be a positive integer.')
   }

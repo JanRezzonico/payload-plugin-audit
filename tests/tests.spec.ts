@@ -45,7 +45,7 @@ const baseConfig = {
 // Same config with the cleanup feature opted in (it is disabled by default).
 const withCleanup = { ...baseConfig, cleanup: { enabled: true } }
 
-const DEFAULT_QUEUE = 'payload-plugin-audit'
+const AUDIT_PLUGIN_QUEUE = 'payload-plugin-audit'
 const DEFAULT_TASK_SLUG = 'payload-plugin-audit-cleanup-logs'
 
 const createPayloadConfig = (collections: CollectionConfig[] = []): Config =>
@@ -127,7 +127,6 @@ describe('plugin configuration', () => {
     expect(merged.cleanup).toEqual({
       enabled: false,
       olderThanDays: 90,
-      queue: DEFAULT_QUEUE,
       schedule: '0 0 * * *',
       silent: false,
     })
@@ -223,7 +222,6 @@ describe('cleanup validation', () => {
     expect(validateCleanup({ olderThanDays: 7, schedule: '0 0 * * * *' })).toEqual({
       enabled: false,
       olderThanDays: 7,
-      queue: DEFAULT_QUEUE,
       schedule: '0 0 * * * *', // 6-field (seconds) cron is accepted
       silent: false,
     })
@@ -242,11 +240,6 @@ describe('cleanup validation', () => {
 
   test.each(['not-a-cron', '', '* * *', '99 * * * *'])('rejects schedule = %j', (value) => {
     expect(() => validateCleanup({ schedule: value } as any)).toThrow('cleanup.schedule')
-  })
-
-  test('rejects blank queue and trims surrounding whitespace', () => {
-    expect(() => validateCleanup({ queue: '   ' } as any)).toThrow('cleanup.queue')
-    expect(validateCleanup({ queue: '  custom-cleanup  ' } as any).queue).toBe('custom-cleanup')
   })
 
   // Validation intentionally stays on even when the feature is disabled.
@@ -409,7 +402,7 @@ describe('cleanup jobs transform', () => {
     expect(transformed.jobs?.tasks?.[1]).toMatchObject({
       slug: DEFAULT_TASK_SLUG,
       retries: 2,
-      schedule: [{ cron: '0 0 * * *', queue: DEFAULT_QUEUE }],
+      schedule: [{ cron: '0 0 * * *', queue: AUDIT_PLUGIN_QUEUE }],
     })
     expect(transformed.jobs).not.toHaveProperty('autoRun')
   })
@@ -481,17 +474,6 @@ describe('cleanup jobs transform', () => {
 
     expect(transformed.jobs?.autoRun).toBe(hostFn)
     expect(hostFn).not.toHaveBeenCalled()
-  })
-
-  test('uses a custom queue and schedule for the task, trimmed', () => {
-    const transformed = applyPlugin([{ slug: 'posts', fields: [] }], {
-      cleanup: { enabled: true, queue: '  my-queue  ', schedule: '30 2 * * *' },
-    })
-
-    expect(transformed.jobs?.tasks?.[0]).toMatchObject({
-      schedule: [{ cron: '30 2 * * *', queue: 'my-queue' }],
-    })
-    expect(transformed.jobs).not.toHaveProperty('autoRun')
   })
 
   test('preserves other host jobs settings', () => {

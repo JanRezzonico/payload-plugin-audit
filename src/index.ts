@@ -77,6 +77,6 @@ type PayloadPluginAuditConfig = IncomingPluginConfig
 
 export type { PayloadPluginAuditConfig }
 
-export { DEFAULT_QUEUE as AUDIT_PLUGIN_DEFAULT_QUEUE } from './config/cleanup/defaults.js'
 export { cleanupLogs as cleanupAuditLogs } from './libs/jobs/cleanup-logs/cleanup.js'
+export { AUDIT_PLUGIN_QUEUE } from './libs/jobs/cleanup-logs/index.js'
 export { TASK_SLUG as AUDIT_CLEANUP_TASK_SLUG } from './libs/jobs/cleanup-logs/index.js'

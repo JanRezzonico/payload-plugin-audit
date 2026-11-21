@@ -6,6 +6,7 @@ import { AuditPluginValidationError } from '../../../utils/AuditPluginValidation
 import { cleanupLogs } from './cleanup.js'
 
 const TASK_SLUG = 'payload-plugin-audit-cleanup-logs'
+const AUDIT_PLUGIN_QUEUE = 'payload-plugin-audit'
 
 const generateCleanupLogsTask = (config: PluginConfig): TaskConfig => {
   const { cleanup, db } = config
@@ -23,7 +24,7 @@ const generateCleanupLogsTask = (config: PluginConfig): TaskConfig => {
       return { output: {} }
     },
     retries: 2,
-    schedule: [{ cron: cleanup.schedule, queue: cleanup.queue }],
+    schedule: [{ cron: cleanup.schedule, queue: AUDIT_PLUGIN_QUEUE }],
   }
 }
 
@@ -42,4 +43,4 @@ const applyCleanupJobs = (jobs: JobsConfig | undefined, config: PluginConfig): J
   }
 }
 
-export { applyCleanupJobs, generateCleanupLogsTask, TASK_SLUG }
+export { applyCleanupJobs, AUDIT_PLUGIN_QUEUE, generateCleanupLogsTask, TASK_SLUG }

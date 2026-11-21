@@ -149,23 +149,23 @@ The plugin only **queues** the cleanup job. Something has to **run** the queue, 
 **Dedicated server, `autoRun`** (handles both scheduling and running):
 
 ```ts
-import { AUDIT_PLUGIN_DEFAULT_QUEUE } from 'payload-plugin-audit'
+import { AUDIT_PLUGIN_QUEUE } from 'payload-plugin-audit'
 
 jobs: {
-  autoRun: [{ cron: '* * * * *', queue: AUDIT_PLUGIN_DEFAULT_QUEUE }], // Or your own queue name provided in cleanup.queue
+  autoRun: [{ cron: '* * * * *', queue: AUDIT_PLUGIN_QUEUE }], // Or your own queue name provided in cleanup.queue
 }
 ```
 
 **Dedicated server, bin script:**
 
 ```sh
-# For --queue use the same queue name as cleanup.queue. If not provided, the default queue name is `payload-plugin-audit` as provided via `AUDIT_PLUGIN_DEFAULT_QUEUE`.
+# For --queue use the same queue name as cleanup.queue. If not provided, the default queue name is `payload-plugin-audit` as provided via `AUDIT_PLUGIN_QUEUE`.
 pnpm payload jobs:run --cron "* * * * *" --queue payload-plugin-audit --handle-schedules
 ```
 
 **Serverless (e.g. Vercel):** use an external cron to call both endpoints:
 
-For ?queue use the same queue name as cleanup.queue. If not provided, the default queue name is `payload-plugin-audit` as provided via `AUDIT_PLUGIN_DEFAULT_QUEUE`.
+For ?queue use the same queue name as cleanup.queue. If not provided, the default queue name is `payload-plugin-audit` as provided via `AUDIT_PLUGIN_QUEUE`.
 
 ```
 GET /api/payload-jobs/handle-schedules?queue=payload-plugin-audit
