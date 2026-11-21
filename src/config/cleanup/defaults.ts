@@ -7,6 +7,7 @@ const cleanupDefaults: ConfigCleanup = {
   olderThanDays: 90,
   queue: DEFAULT_QUEUE,
   schedule: '0 0 * * *',
+  silent: false,
 }
 
 export { cleanupDefaults, DEFAULT_QUEUE }

@@ -9,15 +9,24 @@ type Args = {
   olderThanDays: PluginConfig['cleanup']['olderThanDays']
   payload: BasePayload
   req?: PayloadRequest
+  silent?: PluginConfig['cleanup']['silent']
 }
 
-const cleanupLogs = async ({ collectionSlug, olderThanDays, payload, req }: Args) => {
+const cleanupLogs = async ({
+  collectionSlug,
+  olderThanDays,
+  payload,
+  req,
+  silent = false,
+}: Args) => {
+  const logger = silent ? { info: () => {} } : (payload.logger ?? console ?? { info: () => {} })
   const logPrefix = `[payload-plugin-audit]`
-  payload.logger.info(
+
+  logger.info(
     `${logPrefix} cleanupLogs function invoked for collection "${collectionSlug}" with olderThanDays=${olderThanDays}`,
   )
   const cutoff = new Date(Date.now() - olderThanDays * MS_PER_DAY)
-  payload.logger.info(
+  logger.info(
     `${logPrefix} Deleting logs older than ${olderThanDays} days (before ${cutoff.toISOString()})...`,
   )
 
@@ -34,16 +43,16 @@ const cleanupLogs = async ({ collectionSlug, olderThanDays, payload, req }: Args
 
   const { totalDocs } = await payload.db.count(query)
 
-  payload.logger.info(`${logPrefix} Found ${totalDocs} logs to delete.`)
+  logger.info(`${logPrefix} Found ${totalDocs} logs to delete.`)
 
   if (totalDocs === 0) {
-    payload.logger.info(`${logPrefix} No logs to delete. Exiting early.`)
+    logger.info(`${logPrefix} No logs to delete. Exiting early.`)
     return
   }
 
   await payload.db.deleteMany(query)
 
-  payload.logger.info(`${logPrefix} Deleted ${totalDocs} logs.`)
+  logger.info(`${logPrefix} Deleted ${totalDocs} logs.`)
 }
 
 export { cleanupLogs }

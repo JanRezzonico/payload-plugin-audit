@@ -3,6 +3,7 @@ type ConfigCleanup = {
   olderThanDays: number
   queue: string
   schedule: string
+  silent: boolean
 }
 
 export type { ConfigCleanup }
