@@ -130,6 +130,7 @@ cleanup: {
   olderThanDays: 90,
   schedule: '0 0 * * *',
   queue: 'payload-plugin-audit',
+  silent: false,
 },
 ```
 
@@ -139,6 +140,7 @@ cleanup: {
 | `olderThanDays` | `90`                     | `update` logs older than this many days are deleted.              |
 | `schedule`      | `'0 0 * * *'` (midnight) | Cron expression, five or six fields (six adds seconds precision). |
 | `queue`         | `'payload-plugin-audit'` | Queue the job is added to.                                        |
+| `silent`        | `false`                  | Suppresses cleanup logging.                                       |
 
 #### You need a jobs runner
 

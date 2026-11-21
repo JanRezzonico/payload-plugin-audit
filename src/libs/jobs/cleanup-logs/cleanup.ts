@@ -2,6 +2,8 @@ import type { BasePayload, DeleteManyArgs, PayloadRequest } from 'payload'
 
 import type { PluginConfig } from '../../../config/types.js'
 
+import { silentLogger } from '../../../utils/silent-logger.js'
+
 const MS_PER_DAY = 24 * 60 * 60 * 1000
 
 type Args = {
@@ -19,7 +21,7 @@ const cleanupLogs = async ({
   req,
   silent = false,
 }: Args) => {
-  const logger = silent ? { info: () => {} } : (payload.logger ?? console ?? { info: () => {} })
+  const logger = silent ? silentLogger : (payload.logger ?? console)
   const logPrefix = `[payload-plugin-audit]`
 
   logger.info(

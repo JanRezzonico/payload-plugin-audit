@@ -18,6 +18,7 @@ const generateCleanupLogsTask = (config: PluginConfig): TaskConfig => {
         olderThanDays: cleanup.olderThanDays,
         payload: req.payload,
         req,
+        silent: cleanup.silent,
       })
       return { output: {} }
     },

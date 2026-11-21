@@ -129,6 +129,7 @@ describe('plugin configuration', () => {
       olderThanDays: 90,
       queue: DEFAULT_QUEUE,
       schedule: '0 0 * * *',
+      silent: false,
     })
     expect(merged.db).toMatchObject({
       collections: { logs: { slug: 'content-audit-logs', hidden: true } },
@@ -224,6 +225,7 @@ describe('cleanup validation', () => {
       olderThanDays: 7,
       queue: DEFAULT_QUEUE,
       schedule: '0 0 * * * *', // 6-field (seconds) cron is accepted
+      silent: false,
     })
     expect(validateCleanup(undefined)).toEqual(validateCleanup({}))
   })
@@ -530,18 +532,21 @@ describe('cleanup task handler', () => {
   test('cleanup deletes only old update logs', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-01-31T00:00:00.000Z'))
+
     const cleanupConfig = mergeConfig({
       ...baseConfig,
       cleanup: { olderThanDays: 30 },
     } as any)
     const deleteMany = vi.fn()
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
+    const req = { payload: { db: { count, deleteMany } } }
     const task = generateCleanupLogsTask(cleanupConfig)
 
-    await (task.handler as any)({ req: { payload: { db: { deleteMany } } } })
+    await (task.handler as any)({ req })
 
     expect(deleteMany).toHaveBeenCalledWith({
       collection: 'audit-plugin-logs',
-      req: { payload: { db: { deleteMany } } },
+      req,
       where: {
         and: [
           { operation: { equals: 'update' } },
@@ -560,9 +565,10 @@ describe('cleanup task handler', () => {
       db: { collections: { logs: { slug: 'custom-logs' } } },
     } as any)
     const deleteMany = vi.fn()
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
     const task = generateCleanupLogsTask(cleanupConfig)
 
-    await (task.handler as any)({ req: { payload: { db: { deleteMany } } } })
+    await (task.handler as any)({ req: { payload: { db: { count, deleteMany } } } })
 
     expect(deleteMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -578,9 +584,11 @@ describe('cleanup task handler', () => {
   })
 
   test('cleanup handler returns an empty output', async () => {
+    const deleteMany = vi.fn()
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
     const task = generateCleanupLogsTask(mergeConfig(baseConfig as any))
     const result = await (task.handler as any)({
-      req: { payload: { db: { deleteMany: vi.fn() } } },
+      req: { payload: { db: { count, deleteMany } } },
     })
 
     expect(result).toEqual({ output: {} })
@@ -589,9 +597,10 @@ describe('cleanup task handler', () => {
   test('cleanup handler propagates database errors so the job can retry', async () => {
     const task = generateCleanupLogsTask(mergeConfig(baseConfig as any))
     const deleteMany = vi.fn().mockRejectedValue(new Error('db down'))
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
 
     await expect(
-      (task.handler as any)({ req: { payload: { db: { deleteMany } } } }),
+      (task.handler as any)({ req: { payload: { db: { count, deleteMany } } } }),
     ).rejects.toThrow('db down')
     expect(task.retries).toBe(2)
   })
@@ -602,11 +611,12 @@ describe('cleanupLogs function', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-01-31T00:00:00.000Z'))
     const deleteMany = vi.fn()
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
 
     await cleanupLogs({
       collectionSlug: 'custom-logs',
       olderThanDays: 30,
-      payload: { db: { deleteMany } } as any,
+      payload: { db: { count, deleteMany } } as any,
     })
 
     expect(deleteMany).toHaveBeenCalledWith({
@@ -623,12 +633,13 @@ describe('cleanupLogs function', () => {
 
   test('forwards the request when provided', async () => {
     const deleteMany = vi.fn()
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
     const req = { id: 'req' } as any
 
     await cleanupLogs({
       collectionSlug: 'audit-plugin-logs',
       olderThanDays: 1,
-      payload: { db: { deleteMany } } as any,
+      payload: { db: { count, deleteMany } } as any,
       req,
     })
 
@@ -636,13 +647,14 @@ describe('cleanupLogs function', () => {
   })
 
   test('propagates database errors', async () => {
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
     const deleteMany = vi.fn().mockRejectedValue(new Error('db down'))
 
     await expect(
       cleanupLogs({
         collectionSlug: 'audit-plugin-logs',
         olderThanDays: 1,
-        payload: { db: { deleteMany } } as any,
+        payload: { db: { count, deleteMany } } as any,
       }),
     ).rejects.toThrow('db down')
   })
@@ -660,13 +672,14 @@ describe('cleanupLogs function', () => {
   test('works without the plugin scheduling anything (cleanup disabled)', async () => {
     const transformed = applyPlugin()
     const deleteMany = vi.fn()
+    const count = vi.fn().mockResolvedValue({ totalDocs: 5 })
 
     expect(transformed.jobs).toBeUndefined()
     await expect(
       cleanupAuditLogs({
         collectionSlug: 'audit-plugin-logs',
         olderThanDays: 30,
-        payload: { db: { deleteMany } } as any,
+        payload: { db: { count, deleteMany } } as any,
       }),
     ).resolves.toBeUndefined()
     expect(deleteMany).toHaveBeenCalledTimes(1)
