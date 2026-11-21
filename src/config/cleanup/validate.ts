@@ -1,5 +1,5 @@
 import { Cron } from 'croner'
-import { deepMergeWithSourceArrays } from 'payload/shared'
+import { deepMergeWithSourceArrays } from 'payload'
 
 import type { IncomingPluginConfig, PluginConfig } from '../types.js'
 

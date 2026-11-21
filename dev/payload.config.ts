@@ -2,7 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
-import { auditPluginPayload } from 'payload-plugin-audit'
+import { AUDIT_PLUGIN_DEFAULT_QUEUE, auditPluginPayload } from 'payload-plugin-audit'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
@@ -31,6 +31,9 @@ export default buildConfig({
     push: true,
   }),
   editor: lexicalEditor(),
+  jobs: {
+    autoRun: [{ cron: '* * * * *', queue: AUDIT_PLUGIN_DEFAULT_QUEUE }],
+  },
   onInit: async (payload) => {
     await seed(payload)
   },
@@ -47,73 +50,12 @@ export default buildConfig({
         },
       },
       cleanup: {
+        enabled: true,
         olderThanDays: 1,
-        schedule: '* 0 0 * * *',
+        schedule: '* * * * *',
       },
       collections: ['posts', 'media', 'post-referencers'],
-      db: {
-        collections: {
-          logs: {
-            // slug: 'the-audit-logs',
-            // hidden: true,
-          },
-        },
-        // fields: {
-        //   createdBy: {
-        //     name: 'myCustomCreatedBy',
-        //   },
-        //   updateLogs: {
-        //     name: 'myCustomUpdateLogs',
-        //   },
-        // },
-      },
       state: 'enabled',
-      ui: {
-        fields: {
-          // createdBy: {
-          //   label: 'This entity was created by',
-          // },
-          // delta: {
-          //   component: {
-          //     badgeLabels: {
-          //       added: 'Addition',
-          //       moved: 'Move',
-          //       removed: 'Removal',
-          //       updated: 'Update',
-          //     },
-          //   },
-          //   rows: {
-          //     labels: {
-          //       change: 'My custom change number {number}',
-          //       fallback: 'My custom fallback',
-          //       latestChange: 'My custom latest change',
-          //     },
-          //   },
-          // },
-          // entity: {
-          //   description: {
-          //     beforeCollection: 'The entity is from the collection:                  ',
-          //     beforeId: 'The entity id is:                  ',
-          //     // separator: '<><><>',
-          //   },
-          // },
-          // updateLogs: {
-          //   date: {
-          //     // displayFormat: 'HH:mm',
-          //     label: 'My custom date label',
-          //   },
-          //   label: 'This is the update log',
-          // },
-          // user: {
-          //   description: {
-          //     beforeCollection: 'The user is from the collection:                  ',
-          //     beforeId: 'The user id is:                  ',
-          //     // separator: '---',
-          //   },
-          //   label: 'This is the user we are talking about',
-          // },
-        },
-      },
       userCollections: ['users', 'other-users'],
     }),
   ],
